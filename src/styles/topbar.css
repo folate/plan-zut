@@ -1,0 +1,39 @@
+.top{display:flex;align-items:center;gap:8px;min-height:56px}
+.ttl{flex:1;min-width:0}
+.ttl h1{margin:0;font-size:22px;font-weight:500;font-variation-settings:"opsz" 28;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ttl .meta{font-size:12.5px;color:var(--muted);display:flex;gap:6px;align-items:center;min-width:0}
+.ttl .meta #metaTxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ttl .meta .sdot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.ttl .meta.err{color:var(--cancel)}.ttl .meta.err .sdot{background:var(--cancel)}
+.ttl .meta.idle .sdot{background:var(--outline)}
+.ib{width:40px;height:40px;border-radius:20px;border:0;background:transparent;color:var(--primary);display:grid;place-items:center;cursor:pointer;position:relative;transition:background .2s var(--ease)}
+.ib:hover{background:color-mix(in srgb,var(--primary) 8%,transparent)}
+.ib:active{background:color-mix(in srgb,var(--primary) 14%,transparent)}
+.ib svg{width:22px;height:22px}
+.ib:disabled{opacity:.38;cursor:default;background:transparent}
+.ib.muted{color:var(--muted)}
+.ib.spin svg{animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tbtn{height:32px;padding:0 12px;border-radius:16px;border:1px solid var(--outline-v);background:transparent;color:var(--primary);font-weight:500;font-size:13px;cursor:pointer}
+.tbtn:hover{background:color-mix(in srgb,var(--primary) 8%,transparent)}
+
+.days{display:none}
+.top{position:relative}
+.top-l,.top-r{display:contents}
+.nav{display:none}
+@media (min-width:821px){
+  .top{display:grid;grid-template-columns:minmax(max-content,1fr) minmax(160px,560px) minmax(max-content,1fr);gap:8px 16px}
+  .top-l,.top-r{display:flex;align-items:center;gap:8px;min-width:0}
+  .top-r{justify-content:flex-end}
+  .top-l .ttl{flex:none;width:208px}
+  .nav{display:flex;align-items:center;gap:2px}
+  .nav .tbtn{margin-left:6px}
+}
+.ttl h1.jump{position:relative;display:flex;align-items:center;gap:2px;width:fit-content;max-width:100%;cursor:pointer;border-radius:8px}
+.ttl h1.jump:hover{color:var(--primary)}
+.ttl h1.jump svg{width:20px;height:20px;color:var(--muted)}
+.ttl h1.jump input{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:0;cursor:pointer}
+.ttl h1.jump input::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;cursor:pointer}
+.tbtn.mob-only{flex:none;place-items:center}
+@media (max-width:359px){.ttl h1.jump svg{display:none}}
+a.tbtn{display:inline-flex;align-items:center;text-decoration:none}

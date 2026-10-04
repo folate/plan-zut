@@ -1,0 +1,12 @@
+node_modules
+dist
+.git
+.github
+.claude
+*.local
+README.md
+android
+assets
+capacitor.config.ts
+docs
+LICENSE

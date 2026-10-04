@@ -1,0 +1,17 @@
+.flag.srv{color:var(--primary)!important;animation:ring 1.6s var(--ease) 2}
+@keyframes ring{0%,100%{transform:rotate(0)}10%,30%{transform:rotate(-14deg)}20%,40%{transform:rotate(14deg)}50%{transform:rotate(0)}}
+.chg-list{display:grid;gap:8px}
+.chg-card{display:grid;gap:4px;padding:14px 16px;border-radius:20px;background:var(--container);transition:opacity .2s,transform .2s var(--ease)}
+.chg-card.gone{opacity:0;transform:translateX(30px)}
+.chg-top{display:flex;align-items:center;gap:8px}
+.chg-k{font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--primary)}
+.k-removed .chg-k{color:var(--cancel)}
+.k-added .chg-k{color:var(--ok)}
+.chg-card b{font-weight:600;font-size:15px}
+.chg-l{font-size:13px;color:var(--muted)}
+.chg-act{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}
+.chg-hist{display:grid;gap:6px;font-size:12.5px;color:var(--muted);padding:8px 4px}
+.chg-hist span{font-family:var(--mono)}
+#toast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:30;transform:translate(-50%,20px);opacity:0;pointer-events:none;display:flex;align-items:center;gap:16px;max-width:calc(100% - 32px);padding:12px 12px 12px 18px;border-radius:12px;background:var(--text);color:var(--bg);font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25);transition:opacity .25s var(--ease),transform .3s var(--ease)}
+#toast.show{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+#toast button{border:0;background:transparent;color:color-mix(in srgb,var(--primary) 60%,var(--bg));font-weight:700;cursor:pointer;padding:6px 8px;border-radius:8px}

@@ -1,0 +1,14 @@
+.bk .abs{color:var(--cancel);opacity:1;font-weight:700}
+.chip.abschip{padding:0 12px;color:var(--cancel);border-color:color-mix(in srgb,var(--cancel) 40%,transparent)}
+.chip.abschip .n{color:inherit}
+.att{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 10px 10px 14px;border-radius:16px;background:var(--container);font-size:14px}
+.att>span{display:grid;gap:2px}
+.att small{font:12px var(--mono);color:var(--muted)}
+.oc.ab{border-color:color-mix(in srgb,var(--cancel) 55%,transparent);color:var(--cancel)}
+.oc.ab.me{background:var(--primary);color:var(--on-primary)}
+.abs-row{align-items:flex-start;padding:12px 14px}
+.abs-row .ver-t{gap:6px}
+.abs-row .ver-t small{display:flex;align-items:center;gap:6px}
+.abs-row .oc{display:inline-flex;align-items:center;gap:4px}
+.abs-row .oc svg{width:12px;height:12px}
+.abs-n{font:500 22px var(--mono);color:var(--cancel);min-width:28px;text-align:right}

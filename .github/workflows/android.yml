@@ -1,0 +1,52 @@
+name: Android
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    env:
+      ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
+      ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+      ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+      ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Klucz do podpisu
+        run: |
+          if [ -z "$ANDROID_KEYSTORE" ]; then
+            echo "Brak sekretu ANDROID_KEYSTORE, bez stałego klucza aktualizacje apki nie zadziałają" >&2
+            exit 1
+          fi
+          echo "$ANDROID_KEYSTORE" | base64 -d > android/release.jks
+          {
+            echo "storeFile=release.jks"
+            echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
+            echo "keyAlias=$ANDROID_KEY_ALIAS"
+            echo "keyPassword=$ANDROID_KEY_PASSWORD"
+          } > android/keystore.properties
+      - name: Wersja z taga
+        run: |
+          sed -i "s/^APP_VERSION=.*/APP_VERSION=${GITHUB_REF_NAME#v}/" .env
+          sed -i "s/^APP_BUILD=.*/APP_BUILD=$GITHUB_RUN_NUMBER/" .env
+      - run: npm ci
+      - run: npm run build:native
+      - run: chmod +x gradlew && ./gradlew assembleRelease
+        working-directory: android
+      - run: cp android/app/build/outputs/apk/release/app-release.apk plan-zut.apk
+      - run: gh release create "$GITHUB_REF_NAME" plan-zut.apk --title "$GITHUB_REF_NAME" --generate-notes
+        env:
+          GH_TOKEN: ${{ github.token }}

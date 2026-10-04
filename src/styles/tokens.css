@@ -1,0 +1,38 @@
+:root{
+  --h:25;
+  --bg:oklch(.99 .007 var(--h));--container:oklch(.958 .022 var(--h));--container-hi:oklch(.928 .032 var(--h));--tile:oklch(.997 .003 var(--h));
+  --text:oklch(.23 .02 var(--h));--muted:oklch(.43 .025 var(--h));--outline:oklch(.6 .025 var(--h));--outline-v:oklch(.86 .022 var(--h));--grid:oklch(.93 .015 var(--h));
+  --primary:oklch(.5 .17 var(--h));--on-primary:#ffffff;--pc:oklch(.9 .055 var(--h));--on-pc:oklch(.27 .09 var(--h));
+  --today:oklch(.935 .04 var(--h));--on-today:oklch(.3 .1 var(--h));
+  --change:#b86400;--cancel:#d32f2f;--ok:#2e7d4f;--now:oklch(.55 .2 var(--h));
+  --wk-bg:oklch(.91 .06 calc(var(--h) + 0));--wk-fg:oklch(.3 .09 calc(var(--h) + 0));--lb-bg:oklch(.91 .06 calc(var(--h) + 55));--lb-fg:oklch(.3 .09 calc(var(--h) + 55));--pr-bg:oklch(.91 .06 calc(var(--h) + 140));--pr-fg:oklch(.3 .09 calc(var(--h) + 140));--lk-bg:oklch(.91 .06 calc(var(--h) + 180));--lk-fg:oklch(.3 .09 calc(var(--h) + 180));--cw-bg:oklch(.91 .06 calc(var(--h) + 235));--cw-fg:oklch(.3 .09 calc(var(--h) + 235));--sm-bg:oklch(.91 .06 calc(var(--h) + 295));--sm-fg:oklch(.3 .09 calc(var(--h) + 295));
+  --ot-bg:oklch(.93 .015 var(--h));--ot-fg:oklch(.3 .02 var(--h));
+  --o1:oklch(.5 .17 var(--h));--o2:oklch(.55 .14 calc(var(--h) + 55));--o3:oklch(.5 .14 calc(var(--h) + 235));--o4:oklch(.5 .12 calc(var(--h) + 140));
+  --b1:#b91b21;--b2:#2f6db5;--b3:#2e7d4f;--b4:#c66d00;--b5:#7b4fb0;--b6:#00838f;
+  --scrim:rgba(20,15,15,.32);
+  --sans:"Roboto Flex",Roboto,system-ui,sans-serif;
+  --mono:"Roboto Mono",ui-monospace,monospace;
+  --ease:cubic-bezier(.2,0,0,1);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:oklch(.175 .012 var(--h));--container:oklch(.225 .018 var(--h));--container-hi:oklch(.29 .025 var(--h));--tile:oklch(.205 .012 var(--h));
+  --text:oklch(.93 .015 var(--h));--muted:oklch(.8 .02 var(--h));--outline:oklch(.64 .02 var(--h));--outline-v:oklch(.38 .02 var(--h));--grid:oklch(.25 .015 var(--h));
+  --primary:oklch(.82 .1 var(--h));--on-primary:oklch(.28 .1 var(--h));--pc:oklch(.38 .11 var(--h));--on-pc:oklch(.93 .04 var(--h));
+  --today:oklch(.265 .035 var(--h));--on-today:oklch(.93 .04 var(--h));
+  --change:#ffd54f;--cancel:#ef7a7a;--ok:#86d4a2;--now:oklch(.78 .15 var(--h));
+  --wk-bg:oklch(.36 .075 calc(var(--h) + 0));--wk-fg:oklch(.93 .04 calc(var(--h) + 0));--lb-bg:oklch(.36 .075 calc(var(--h) + 55));--lb-fg:oklch(.93 .04 calc(var(--h) + 55));--pr-bg:oklch(.36 .075 calc(var(--h) + 140));--pr-fg:oklch(.93 .04 calc(var(--h) + 140));--lk-bg:oklch(.36 .075 calc(var(--h) + 180));--lk-fg:oklch(.93 .04 calc(var(--h) + 180));--cw-bg:oklch(.36 .075 calc(var(--h) + 235));--cw-fg:oklch(.93 .04 calc(var(--h) + 235));--sm-bg:oklch(.36 .075 calc(var(--h) + 295));--sm-fg:oklch(.93 .04 calc(var(--h) + 295));
+  --ot-bg:oklch(.3 .015 var(--h));--ot-fg:oklch(.92 .015 var(--h));
+  --o1:oklch(.82 .1 var(--h));--o2:oklch(.82 .1 calc(var(--h) + 55));--o3:oklch(.8 .09 calc(var(--h) + 235));--o4:oklch(.8 .09 calc(var(--h) + 140));
+  --b1:#ffb3aa;--b2:#a6c8ff;--b3:#86d4a2;--b4:#ffb870;--b5:#d3b6ff;--b6:#7fdbe4;
+  --scrim:rgba(0,0,0,.5);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:oklch(.175 .012 var(--h));--container:oklch(.225 .018 var(--h));--container-hi:oklch(.29 .025 var(--h));--tile:oklch(.205 .012 var(--h));
+  --text:oklch(.93 .015 var(--h));--muted:oklch(.8 .02 var(--h));--outline:oklch(.64 .02 var(--h));--outline-v:oklch(.38 .02 var(--h));--grid:oklch(.25 .015 var(--h));
+  --primary:oklch(.82 .1 var(--h));--on-primary:oklch(.28 .1 var(--h));--pc:oklch(.38 .11 var(--h));--on-pc:oklch(.93 .04 var(--h));
+  --today:oklch(.265 .035 var(--h));--on-today:oklch(.93 .04 var(--h));
+  --change:#ffd54f;--cancel:#ef7a7a;--ok:#86d4a2;--now:oklch(.78 .15 var(--h));
+  --wk-bg:oklch(.36 .075 calc(var(--h) + 0));--wk-fg:oklch(.93 .04 calc(var(--h) + 0));--lb-bg:oklch(.36 .075 calc(var(--h) + 55));--lb-fg:oklch(.93 .04 calc(var(--h) + 55));--pr-bg:oklch(.36 .075 calc(var(--h) + 140));--pr-fg:oklch(.93 .04 calc(var(--h) + 140));--lk-bg:oklch(.36 .075 calc(var(--h) + 180));--lk-fg:oklch(.93 .04 calc(var(--h) + 180));--cw-bg:oklch(.36 .075 calc(var(--h) + 235));--cw-fg:oklch(.93 .04 calc(var(--h) + 235));--sm-bg:oklch(.36 .075 calc(var(--h) + 295));--sm-fg:oklch(.93 .04 calc(var(--h) + 295));
+  --ot-bg:oklch(.3 .015 var(--h));--ot-fg:oklch(.92 .015 var(--h));
+  --o1:oklch(.82 .1 var(--h));--o2:oklch(.82 .1 calc(var(--h) + 55));--o3:oklch(.8 .09 calc(var(--h) + 235));--o4:oklch(.8 .09 calc(var(--h) + 140));
+  --b1:#ffb3aa;--b2:#a6c8ff;--b3:#86d4a2;--b4:#ffb870;--b5:#d3b6ff;--b6:#7fdbe4;
+  --scrim:rgba(0,0,0,.5);color-scheme:dark}

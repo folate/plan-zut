@@ -1,0 +1,38 @@
+@media (max-width:820px){
+  .wrap{padding-block:4px 104px}
+  #prev,#next{display:none}
+  .wk-nav{width:28px!important;padding:0!important;color:var(--muted);display:grid!important;place-items:center}
+  .wk-nav svg{width:20px;height:20px;transform:rotate(90deg)}
+  .wk-nav.nx svg{transform:rotate(-90deg)}
+  .days{display:grid;grid-template-columns:28px repeat(var(--n),minmax(0,1fr)) 28px;gap:4px;padding-block:4px 4px}
+  .days button{position:relative;border:0;background:transparent;border-radius:16px;padding:8px 0 9px;display:grid;justify-items:center;gap:2px;cursor:pointer;transition:background .25s var(--ease),color .25s var(--ease)}
+  .days .w{font-size:12px;font-weight:500;color:var(--muted)}
+  .days .d{font-size:18px;font-weight:500;font-variation-settings:"opsz" 24;font-variant-numeric:tabular-nums;width:36px;height:30px;display:grid;place-items:center;border-radius:15px}
+  .days .k{display:flex;gap:3px;height:5px}
+  .days .k i{width:5px;height:5px;border-radius:50%;background:var(--kc)}
+  .days button.today .d{color:var(--primary)}
+  .days button[aria-pressed="true"]{background:var(--container)}
+  .days button[aria-pressed="true"] .d{background:var(--primary);color:var(--on-primary)}
+  .week{grid-template-columns:1fr}
+  .week .day:not(.sel){display:none}
+  .day,.day.today{border-radius:28px;padding:6px;background:var(--container)}
+  .day .dh{display:none}
+  .it{min-height:64px}
+  .sheet{left:0;right:0;top:auto;bottom:0;transform:none;width:100%;max-height:92%;border-radius:28px 28px 0 0;padding-bottom:env(safe-area-inset-bottom,0px);animation:up .3s var(--ease)}
+  .sheet::before{content:"";width:32px;height:4px;border-radius:2px;background:var(--outline);opacity:.5;margin:10px auto 0}
+  @keyframes up{from{transform:translateY(40px);opacity:.4}}
+  .two{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .fab{right:16px}
+  .tbtn.desk{display:none}
+  .top{gap:0}.ib{width:36px;height:36px}.ib svg{width:20px;height:20px}
+  .ttl h1{font-size:20px}
+}
+@media (max-width:380px){.fab span{display:none}.fab{padding:0 16px}}
+@media (min-width:821px){.ttl .mob{display:none}}
+@media (max-width:820px){.ttl .desk{display:none}}
+
+@supports (-webkit-touch-callout:none){
+  input,select,textarea{font-size:16px!important}
+  .fld input[type=date],.fld input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;display:block;line-height:46px}
+  .fld input::-webkit-date-and-time-value{text-align:left}
+}

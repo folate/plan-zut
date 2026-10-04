@@ -1,0 +1,8 @@
+@media (prefers-reduced-motion:no-preference){
+  .anim .it,.anim .gap,.anim .empty{animation:rise .38s var(--ease) both;animation-delay:calc(var(--i,0) * 32ms)}
+  .anim.from-r .week{animation:fromR .34s var(--ease) both}
+  .anim.from-l .week{animation:fromL .34s var(--ease) both}
+  @keyframes rise{from{opacity:0;transform:translateY(8px)}}
+  @keyframes fromR{from{opacity:0;transform:translateX(28px)}}
+  @keyframes fromL{from{opacity:0;transform:translateX(-28px)}}
+}

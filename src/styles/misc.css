@@ -1,0 +1,27 @@
+.errbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px;padding:10px 8px 10px 16px;border-radius:20px;background:color-mix(in srgb,var(--change) 14%,var(--bg));animation:rise .3s var(--ease)}
+.errbar>svg{width:20px;height:20px;color:var(--change);flex:none}
+.errbar.k-auth,.errbar.k-key,.errbar.k-link{background:color-mix(in srgb,var(--cancel) 11%,var(--bg))}
+.errbar.k-auth>svg,.errbar.k-key>svg,.errbar.k-link>svg{color:var(--cancel)}
+.errbar>span:nth-child(2){flex:1;min-width:200px;font-size:13.5px}
+.errbar b{font-weight:600}
+.eb-act{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.eb-act .tbtn{background:var(--bg);border-color:transparent}
+
+.qr-box{display:grid;place-items:center;padding:16px;border-radius:20px;background:#fff}
+.qr-box svg{width:min(280px,100%);height:auto;display:block}
+.row-btns{display:flex;gap:6px;flex-wrap:wrap}
+#x-code{height:84px;font-size:11px}
+.fab{position:fixed;right:clamp(16px,2vw,32px);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:10;height:56px;padding:0 20px 0 16px;border-radius:16px;border:0;background:var(--pc);color:var(--on-pc);display:inline-flex;align-items:center;gap:10px;font-weight:600;font-size:14px;cursor:pointer;box-shadow:0 3px 6px rgba(0,0,0,.12),0 6px 18px rgba(0,0,0,.12);transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+.fab:hover{box-shadow:0 4px 8px rgba(0,0,0,.14),0 10px 24px rgba(0,0,0,.14)}
+.fab:active{transform:scale(.96)}
+.fab svg{width:22px;height:22px}
+.secret{display:flex;align-items:center;gap:8px 12px;flex-wrap:wrap;padding:12px 10px 12px 16px;border-radius:16px;background:var(--container)}
+.secret-l{font-size:12px;font-weight:600;color:var(--muted)}
+.secret code{flex:1;font:600 20px var(--mono);letter-spacing:.06em;color:var(--text);user-select:all}
+.secret code.hid{color:var(--muted);user-select:none}
+.grp-row.pick{align-items:center}
+.grp-row.pick>.av{flex:none;display:inline-grid;color:#fff}
+.scan{display:grid;gap:8px}
+.scan video{width:100%;max-height:320px;border-radius:20px;background:#000;object-fit:cover}
+.cal-link{display:grid;gap:8px;justify-items:start}
+.cal-link .fld{width:100%}

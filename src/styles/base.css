@@ -1,0 +1,11 @@
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.4;font-variation-settings:"opsz" 14;-webkit-tap-highlight-color:transparent}
+.wrap{margin:0 auto;padding-inline:clamp(16px,2vw,32px);padding-block:12px 104px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+svg{flex:none}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+img{max-width:100%}

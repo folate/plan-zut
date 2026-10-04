@@ -1,0 +1,13 @@
+.tg.single{grid-template-columns:44px minmax(0,1fr);column-gap:4px;padding:6px 8px 10px 0;border-radius:24px}
+.tg.single .tg-ax span{right:4px;font-size:11px}
+.tg.single .tg-ax .tg-nowlbl{right:2px}
+.tg-h.duo{display:grid;grid-template:none / 1fr 1fr;gap:0;padding:8px 0;overflow:visible}
+.tg-h.duo .who{display:flex;align-items:center;gap:6px;min-width:0;padding:0 8px;font-size:13px;font-weight:600}
+.tg-h.duo .who>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tg-h.duo .av{color:#fff}
+.tg.single .tg-col.split::after{border-left:1.5px dashed var(--outline)}
+
+.tg-gap.both{z-index:1}
+.tg-gap.both.long{background:color-mix(in srgb,var(--ok) 12%,var(--bg))}
+.tg-gap.both:not(.long):not(.tiny) span{padding:0 6px;background:var(--bg)}
+.bk.peer.clash{box-shadow:none}
