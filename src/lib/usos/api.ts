@@ -53,6 +53,7 @@ export async function apiRaw(method: string, params: Params, tok?: Token | null)
     if (r.status >= 500) throw netErr('down', `USOS ma problemy (błąd ${r.status}). Spróbuj za chwilę.`, r.status);
     if (r.status === 429) throw netErr('down', 'USOS ogranicza liczbę zapytań. Spróbuj za kilka minut.', 429);
     if (/timestamp/.test(ml)) throw netErr('key', 'USOS odrzucił zapytanie z powodu złej godziny. Sprawdź datę i godzinę w urządzeniu.', r.status);
+    if (/denied/.test(ml) && r.status !== 401) throw netErr('other', 'USOS nie pozwala Ci zobaczyć tych danych.', r.status);
     if (tok && (r.status === 401 || /token|revoked|unauthori/.test(ml)))
       throw netErr('auth', 'Dostęp do konta USOS wygasł albo został cofnięty (np. na stronie usosapi.zut.edu.pl/apps). Zaloguj się ponownie.', r.status);
     if (/consumer|signature|nonce/.test(ml) || r.status === 401)

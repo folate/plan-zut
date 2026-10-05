@@ -21,10 +21,14 @@ const MOBILE_QUERY = '(max-width:820px)';
 function initProfiles(): Profile[] {
   let list = store.get<Profile[] | null>('profiles', null);
   if (!list) {
-    list = [{ id: 'p1', name: 'Mój plan', url: store.get('url', ''), synced: store.get('synced', null), ci: 0 }];
-    for (const k of ['ics', 'custom', 'overrides']) {
-      const v = store.get<unknown>(k, null);
-      if (v) store.set(pk(k, 'p1'), v);
+    const old = ['ics', 'custom', 'overrides'];
+    list = [];
+    if (store.get('url', '') || old.some((k) => store.get<unknown>(k, null))) {
+      list = [{ id: 'p1', name: 'Mój plan', url: store.get('url', ''), synced: store.get('synced', null), ci: 0 }];
+      for (const k of old) {
+        const v = store.get<unknown>(k, null);
+        if (v) store.set(pk(k, 'p1'), v);
+      }
     }
     store.set('profiles', list);
   }
@@ -34,6 +38,7 @@ function initProfiles(): Profile[] {
 class AppState {
   profiles = $state.raw<Profile[]>(initProfiles());
   pid = $state<string | null>(null);
+  def = $state<string | null>(store.get('defaultProfile', null));
   cmp = $state<string | null>(null);
   usos = $state.raw<UsosEvent[]>([]);
   custom = $state.raw<CustomEvent[]>([]);
@@ -106,6 +111,10 @@ export const addProfile = (p: Profile) => saveProfiles([...app.profiles, p]);
 export const updateProfile = (id: string, patch: Partial<Profile>) =>
   saveProfiles(app.profiles.map((p) => (p.id === id ? { ...p, ...patch } : p)));
 export const removeProfile = (id: string) => saveProfiles(app.profiles.filter((p) => p.id !== id));
+export function setDefault(id: string | null) {
+  app.def = id;
+  store.set('defaultProfile', id);
+}
 
 export function hasPlan(id: string | null | undefined) {
   void app.rev;

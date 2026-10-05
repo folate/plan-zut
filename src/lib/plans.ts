@@ -1,5 +1,5 @@
 import {
-  addProfile, animate, app, dropPeerCache, hasPlan, jumpToRelevant, newId, nextCi, prof, removeProfile, touch, updateProfile
+  addProfile, animate, app, dropPeerCache, hasPlan, jumpToRelevant, newId, nextCi, prof, removeProfile, setDefault, touch, updateProfile
 } from './app.svelte';
 import { diffPlans } from './changes';
 import { PREVIEW_ID, TYPES } from './constants';
@@ -84,9 +84,6 @@ export function switchProfile(id: string) {
   jumpToRelevant();
   animate();
   if (app.hasSource && due(app.profile)) sync().catch(() => {});
-  checkUpdate().then(() => {
-    if (release.latest) toast(`Jest nowa wersja apki (${release.latest})`, 'Pobierz', download);
-  });
 }
 
 export function ensureProfile(): Profile {
@@ -103,6 +100,7 @@ export function deleteProfile(id: string) {
   dropPeerCache(id);
   touch();
   if (app.cmp === id) app.cmp = null;
+  if (app.def === id) setDefault(null);
   if (app.pid === id) {
     loadProfile(app.profiles[0]?.id);
     jumpToRelevant();
@@ -322,11 +320,14 @@ async function finishCallbackLogin() {
 export function boot() {
   const returning = !!new URLSearchParams(location.search).get('oauth_verifier');
   const importing = location.hash.startsWith('#sync=');
-  loadProfile(store.get('activeProfile', app.profiles[0]?.id));
+  loadProfile(hasPlan(app.def) ? app.def : store.get('activeProfile', app.profiles[0]?.id));
   finishCallbackLogin();
   if (importing) setTimeout(() => openSheet({ name: 'import', code: location.hash.slice(6) }), 200);
   else if (!store.get('onboarded', false) && !app.profiles.some((p) => hasPlan(p.id)) && !returning)
     setTimeout(() => openSheet({ name: 'welcome' }), 300);
   jumpToRelevant();
   if (app.hasSource && due(app.profile)) sync().catch(() => {});
+  checkUpdate().then(() => {
+    if (release.latest) toast(`Jest nowa wersja apki (${release.latest})`, 'Pobierz', download);
+  });
 }

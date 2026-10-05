@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { app, goToDate } from '../../lib/app.svelte';
+  import { app, goToDate, peerData } from '../../lib/app.svelte';
   import { changeLine, evFromJson, ghostsOf } from '../../lib/changes';
   import { KIND, shortB, typeOf, typeStyle } from '../../lib/constants';
   import { cap, fmtDay, fmtFull, hm, pad } from '../../lib/dates';
   import { applyOv } from '../../lib/events';
-  import { msgOf } from '../../lib/net';
+  import { msgOf, NetError } from '../../lib/net';
   import { patternOf } from '../../lib/pattern';
   import { isAbsent, toggleAbsence } from '../../lib/absences';
   import { openPreview, saveAbsences } from '../../lib/plans';
@@ -55,6 +55,8 @@
   let busyChip = $state('');
   let people = $state.raw<{ id: string; name: string }[] | null>(null);
   let loadingPeople = $state(false);
+  const mine = app.profiles.find((p) => p.api?.kind === 'account');
+  const inGroup = !mine || !base || peerData(mine.id).usos.some((e) => String(e.unit) === String(base.unit) && String(e.group) === String(base.group));
 
   async function preview(it: SearchItem, chip: string) {
     busyChip = chip;
@@ -74,7 +76,7 @@
       const me = session.auth?.user?.id;
       people = (r.participants || []).filter((x: any) => String(x.id) !== String(me)).sort((a: any, b: any) => a.last_name.localeCompare(b.last_name, 'pl')).map((x: any) => ({ id: String(x.id), name: `${x.first_name} ${x.last_name}` }));
     } catch (e) {
-      toast(msgOf(e));
+      toast(e instanceof NetError && e.status === 400 ? 'Uczestników widzą tylko osoby z tej grupy i prowadzący.' : msgOf(e));
     } finally {
       loadingPeople = false;
     }
@@ -129,9 +131,9 @@
         </div>
         {#if !session.auth}
           <p class="hint">Po zalogowaniu przez USOS (Ustawienia) zobaczysz też uczestników grupy.</p>
-        {:else if !people}
+        {:else if inGroup && !people}
           <button type="button" class="tbtn" disabled={loadingPeople} onclick={loadParticipants}>{loadingPeople ? 'Wczytuję…' : 'Pokaż uczestników grupy'}</button>
-        {:else}
+        {:else if people}
           <div class="pchips">
             {#each people as x (x.id)}
               <button type="button" class="pchip sm" class:busy={busyChip === x.id} onclick={() => preview({ kind: 'common', id: x.id, name: `Wspólne z: ${x.name}` }, x.id)}><span>{x.name}</span></button>

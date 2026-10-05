@@ -26,7 +26,7 @@ async function pwKey(pw: string, salt: Uint8Array) {
   return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: salt as BufferSource, iterations: 200000, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
 }
 
-export function collectSync(profiles: Profile[], credentials: Record<string, unknown> | null): SyncData {
+export function collectSync(profiles: Profile[], credentials: Record<string, unknown> | null, withDefault = false): SyncData {
   const d: SyncData = { v: 1, g: {}, p: {} };
   for (const k of GLOBAL_KEYS) {
     const v = store.get<unknown>(k, undefined);
@@ -34,6 +34,8 @@ export function collectSync(profiles: Profile[], credentials: Record<string, unk
   }
   d.g.profiles = profiles.map(({ synced, ...x }) => x);
   if (!profiles.some((p) => p.id === d.g.activeProfile)) delete d.g.activeProfile;
+  const def = store.get<string | null>('defaultProfile', null);
+  if (withDefault && profiles.some((p) => p.id === def)) d.g.defaultProfile = def;
   for (const p of profiles) d.p[p.id] = { custom: planStore.getCustom(p.id), overrides: planStore.getOverrides(p.id), absences: planStore.getAbsences(p.id) };
   Object.assign(d.g, credentials);
   return d;
@@ -88,6 +90,7 @@ function savePlanData(d: SyncData) {
 }
 
 export function applySync(d: SyncData) {
+  store.remove('defaultProfile');
   for (const [k, v] of Object.entries(d.g || {})) store.set(k, v);
   savePlanData(d);
 }
@@ -98,6 +101,7 @@ export function mergeSync(d: SyncData) {
   store.set('profiles', [...plans.values()]);
   if (d.g.apiKey && !store.get<{ key?: string } | null>('apiKey', null)?.key) store.set('apiKey', d.g.apiKey);
   if (d.g.usosAuth && !store.get('usosAuth', null)) store.set('usosAuth', d.g.usosAuth);
+  if (d.g.defaultProfile) store.set('defaultProfile', d.g.defaultProfile);
   savePlanData(d);
 }
 

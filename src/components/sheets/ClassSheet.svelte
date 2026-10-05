@@ -28,6 +28,12 @@
   let building = $state(cur?.building ?? '');
   let note = $state(cur?.note ?? '');
   let cancelled = $state(!!single.cancelled);
+  let allCancelled = $state(!!series.cancelled);
+  let cDow = $state(series.cDow != null ? String(series.cDow) : '');
+  let cFrom = $state(series.cFrom ?? '');
+  let cTo = $state(series.cTo ?? '');
+  // svelte-ignore state_referenced_locally
+  const seriesDows = [...new Set(app.usos.filter((e) => e.skey === base?.skey).map((e) => dowOf(e.start)))].sort();
   let msg = $state('');
 
   function save() {
@@ -47,6 +53,13 @@
       else delete ov.single[uid];
     } else {
       if (dow !== '' && +dow !== dowOf(base.start)) n.dow = +dow;
+      if (allCancelled) {
+        if (cFrom && cTo && cTo < cFrom) return void (msg = 'Koniec odwołania musi być po jego początku.');
+        n.cancelled = true;
+        if (cDow !== '') n.cDow = +cDow;
+        if (cFrom) n.cFrom = cFrom;
+        if (cTo) n.cTo = cTo;
+      }
       if (Object.keys(n).length) ov.series[base.skey] = n;
       else delete ov.series[base.skey];
     }
@@ -75,7 +88,7 @@
     </div>
     <div class="radios" role="radiogroup" aria-label="Zakres zmiany">
       <label><input type="radio" value="one" bind:group={scope} /><span>Tylko {fmtLong(base.start)}<small>Jednorazowe przeniesienie lub odwołanie</small></span></label>
-      <label><input type="radio" value="all" bind:group={scope} /><span>Wszystkie zajęcia tej grupy<small>Stała zmiana sali, godziny albo dnia</small></span></label>
+      <label><input type="radio" value="all" bind:group={scope} /><span>Wszystkie zajęcia tej grupy<small>Stała zmiana sali, godziny albo dnia, odwołanie na dłużej</small></span></label>
     </div>
     {#if scope === 'one'}
       <div class="fld"><label for="c-date">Data</label><input id="c-date" type="date" bind:value={date} /></div>
@@ -102,6 +115,24 @@
     <div class="fld"><label for="c-note">Notatka</label><input id="c-note" type="text" maxlength="80" placeholder="np. ustalone na zajęciach 30.09" bind:value={note} /></div>
     {#if scope === 'one'}
       <label class="switch">Zajęcia odwołane<input type="checkbox" role="switch" bind:checked={cancelled} /></label>
+    {:else}
+      <label class="switch">Zajęcia odwołane<input type="checkbox" role="switch" bind:checked={allCancelled} /></label>
+      {#if allCancelled}
+        {#if seriesDows.length > 1}
+          <div class="fld">
+            <label for="c-cdow">W które dni</label>
+            <select id="c-cdow" bind:value={cDow}>
+              <option value="">We wszystkie</option>
+              {#each seriesDows as d}<option value={String(d)}>Tylko {DOWS[d]}</option>{/each}
+            </select>
+          </div>
+        {/if}
+        <div class="two">
+          <div class="fld"><label for="c-cfrom">Od dnia</label><input id="c-cfrom" type="date" bind:value={cFrom} /></div>
+          <div class="fld"><label for="c-cto">Do dnia</label><input id="c-cto" type="date" bind:value={cTo} /></div>
+        </div>
+        <p class="hint">Puste daty oznaczają cały semestr. Liczy się termin z USOS, nie przeniesiony przez Ciebie.</p>
+      {/if}
     {/if}
     {#if msg}<div class="msg">{msg}</div>{/if}
 

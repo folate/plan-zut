@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { app } from '../../lib/app.svelte';
+  import { app, prof } from '../../lib/app.svelte';
   import { msgOf } from '../../lib/net';
   import { shareBase } from '../../lib/platform';
   import { statusOf } from '../../lib/profileLabels';
@@ -14,6 +14,7 @@
 
   let picked = $state(app.profiles.map((p) => p.id));
   let withAuth = $state(false);
+  let withDefault = $state(true);
   let showSecret = $state(false);
   let msg = $state('');
   let busy = $state(false);
@@ -29,7 +30,7 @@
     try {
       const secret = generateSecret();
       const credentials = hasAuth && withAuth ? { ...(session.key.key ? { apiKey: session.key } : {}), ...(session.auth ? { usosAuth: session.auth } : {}) } : null;
-      const code = await packSync(collectSync(plans, credentials), normalizeSecret(secret));
+      const code = await packSync(collectSync(plans, credentials, withDefault), normalizeSecret(secret));
       const base = shareBase(), text = base ? base + '#sync=' + code : code;
       let svg = '', qrError = '';
       try {
@@ -71,6 +72,12 @@
     <Switch
       label="Dołącz logowanie USOS i klucz API" bind:checked={withAuth}
       sub={withAuth ? 'Kod da dostęp do Twojego konta USOS. Pokaż go tylko na własnym urządzeniu.' : 'Na drugim urządzeniu zalogujesz się ponownie.'}
+    />
+  {/if}
+  {#if app.def && picked.includes(app.def)}
+    <Switch
+      label="Przenieś też plan domyślny" bind:checked={withDefault}
+      sub={withDefault ? `Na drugim urządzeniu przy starcie też będzie się otwierał „${prof(app.def)?.name}”.` : 'Drugie urządzenie zostanie przy swoim ustawieniu.'}
     />
   {/if}
   <p class="hint">W kodzie są źródła planów, nie same plany, więc pobiorą się na nowo. Plany wczytane z pliku .ics trzeba będzie dodać ponownie.</p>

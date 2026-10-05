@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { addProfile, animate, app, dropPeerCache, hasPlan, jumpToRelevant, newId, nextCi, prof, updateProfile } from '../../lib/app.svelte';
+  import { addProfile, animate, app, dropPeerCache, hasPlan, jumpToRelevant, newId, nextCi, prof, setDefault, updateProfile } from '../../lib/app.svelte';
   import { fetchIcs, msgOf } from '../../lib/net';
   import * as planStore from '../../lib/planStore';
   import { deleteProfile, loadProfile, recordChanges, storeIcs } from '../../lib/plans';
@@ -13,6 +13,7 @@
   import ConfirmButton from '../ConfirmButton.svelte';
   import Icon from '../Icon.svelte';
   import Sheet from '../Sheet.svelte';
+  import Switch from '../Switch.svelte';
 
   let { id, mode }: { id: string | null; mode?: 'link' | 'file' } = $props();
 
@@ -20,7 +21,7 @@
   const p = prof(id);
   const fromApi = !!p?.api;
 
-  let name = $state(p?.name ?? '');
+  let name = $state(p?.name ?? (app.profiles.length ? '' : 'Mój plan'));
   let url = $state(p?.url ?? '');
   let ics = $state('');
   let msg = $state<{ text: string; ok?: boolean } | null>(null);
@@ -104,6 +105,9 @@
   {/if}
   {#if p?.api?.kind === 'account' && session.auth}<CalendarLink />{/if}
   {#if msg && fromApi}<div class="msg" class:ok={msg.ok}>{msg.text}</div>{/if}
+  {#if p && hasPlan(p.id)}
+    <Switch label="Plan domyślny" sub="Ten plan pokaże się przy każdym otwarciu apki." checked={app.def === p.id} onchange={(on) => setDefault(on ? p.id : null)} />
+  {/if}
 
   {#snippet footer()}
     {#if p}<ConfirmButton class="btn danger sp" confirm="Usunąć ten plan?" onconfirm={remove}>Usuń plan</ConfirmButton>{/if}

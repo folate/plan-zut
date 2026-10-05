@@ -19,20 +19,24 @@ export function newer(a: string, b: string) {
   return false;
 }
 
-export async function checkUpdate() {
-  if (!isNative() || !repo || !VERSION) return;
+export async function checkUpdate(force = false) {
+  if (!isNative() || !repo || !VERSION) return false;
   const seen = store.get<string>('latestVersion', '');
-  if (Date.now() - store.get('updateCheck', 0) > DAY) {
+  let ok = true;
+  if (force || Date.now() - store.get('updateCheck', 0) > DAY) {
+    ok = false;
     try {
       const r = await fetch(`https://api.github.com/repos/${repo}/releases/latest`);
       if (r.ok) {
         store.set('latestVersion', String((await r.json()).tag_name || ''));
         store.set('updateCheck', Date.now());
+        ok = true;
       }
     } catch {}
   }
   const latest = store.get<string>('latestVersion', seen);
   if (latest && newer(latest, VERSION)) release.latest = latest.replace(/^v/, '');
+  return ok;
 }
 
 export const download = () => (location.href = apkUrl);

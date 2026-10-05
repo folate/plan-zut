@@ -2,10 +2,10 @@
   import { FM, HUES, THEMES, TRANSFER } from '../../lib/constants';
   import { pad } from '../../lib/dates';
   import { isNative } from '../../lib/platform';
-  import { apkUrl, download, isAndroid, release, VERSION } from '../../lib/release.svelte';
+  import { apkUrl, checkUpdate, download, isAndroid, release, VERSION } from '../../lib/release.svelte';
   import { setCollisions, setFm, setGridRange, setHue, setProxy, setTheme, settings } from '../../lib/settings.svelte';
   import { store } from '../../lib/storage';
-  import { closeSheet, openSheet, startTour } from '../../lib/ui.svelte';
+  import { closeSheet, openSheet, startTour, toast } from '../../lib/ui.svelte';
   import { session, setKey } from '../../lib/usos/session.svelte';
   import ConfirmButton from '../ConfirmButton.svelte';
   import Seg from '../Seg.svelte';
@@ -20,6 +20,14 @@
 
   let key = $state(session.key.key), secret = $state(session.key.secret);
   const saveKey = () => setKey({ key: key.trim(), secret: secret.trim() });
+
+  let checking = $state(false);
+  async function check() {
+    checking = true;
+    const ok = await checkUpdate(true);
+    checking = false;
+    toast(!ok ? 'Nie udało się sprawdzić. Spróbuj później.' : release.latest ? `Jest nowa wersja apki (${release.latest})` : 'Masz najnowszą wersję.');
+  }
 
   function wipe() {
     store.clear();
@@ -112,7 +120,10 @@
       <h3>Aplikacja</h3>
       {#if isNative()}
         <p class="hint">Wersja {VERSION}{release.latest ? `, dostępna jest ${release.latest}` : ', aktualna'}. Aktualizacja nie rusza zapisanych planów.</p>
-        {#if release.latest}<button type="button" class="tbtn" style="justify-self:start" onclick={download}>Pobierz wersję {release.latest}</button>{/if}
+        <div class="row-btns">
+          {#if release.latest}<button type="button" class="tbtn" onclick={download}>Pobierz wersję {release.latest}</button>{/if}
+          <button type="button" class="tbtn" disabled={checking} onclick={check}>{checking ? 'Sprawdzam…' : 'Sprawdź aktualizacje'}</button>
+        </div>
       {:else}
         <p class="hint">Plan ZUT jest też jako zwykła aplikacja na Androida. Dane ze strony przeniesiesz do niej kodem QR.</p>
         <a class="tbtn" style="justify-self:start" href={apkUrl}>Pobierz plik APK</a>

@@ -14,7 +14,8 @@ export function diffPlans(oldT: string, newT: string, now = new Date()): Change[
   const om = new Map(O.map((e) => [e.uid, e])), nm = new Map(N.map((e) => [e.uid, e]));
   const nMin = Math.min(...N.map((e) => +e.start)), nMax = Math.max(...N.map((e) => +e.start)), oMax = Math.max(...O.map((e) => +e.start));
   const removed = O.filter((e) => e.start >= now && +e.start <= nMax && +e.start >= nMin && !nm.has(e.uid));
-  const added = N.filter((e) => e.start >= now && +e.start <= oMax && !om.has(e.uid));
+  const oEnd = new Date(oMax).setHours(23, 59, 59, 999);
+  const added = N.filter((e) => e.start >= now && +e.start <= oEnd && !om.has(e.uid));
   const out: Change[] = [], at = Date.now();
   const mk = (kind: ChangeKind, e: UsosEvent, before: ChangeSide | null, after: ChangeSide | null): Change => ({
     id: 'c' + Math.random().toString(36).slice(2, 9), at, kind, ack: false, ev: evToJson(e), before, after

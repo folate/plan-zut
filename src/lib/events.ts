@@ -1,6 +1,6 @@
 import { OWN_KEY, REPEAT, DSHORT } from './constants';
-import { DAY, addDays, atTime, dowOf, dur, fromYmd, hm, minsBetween, monday, sameDay } from './dates';
-import type { Collisions, Conflict, CustomEvent, Gap, Overrides, UsosEvent, ViewEvent } from './types';
+import { DAY, addDays, atTime, dowOf, dur, fromYmd, hm, minsBetween, monday, sameDay, ymd } from './dates';
+import type { Collisions, Conflict, CustomEvent, Gap, Override, Overrides, UsosEvent, ViewEvent } from './types';
 
 export const emptyOv = (): Overrides => ({ single: {}, series: {} });
 
@@ -23,8 +23,15 @@ export function applyOv(e: UsosEvent, ovs: Overrides): ViewEvent {
     if (v.building) { x.building = v.building; x.mod.add('room'); }
     if (v.note) x.note = v.note;
     if (v === o && v.cancelled) x.cancelled = true;
+    if (v === s && v.cancelled && inCancel(e, v)) x.cancelled = true;
   }
   return x;
+}
+
+function inCancel(e: UsosEvent, v: Override) {
+  const d = ymd(e.start);
+  if (v.cDow != null && v.cDow !== dowOf(e.start)) return false;
+  return !(v.cFrom && d < v.cFrom) && !(v.cTo && d > v.cTo);
 }
 
 export const daysOf = (c: Pick<CustomEvent, 'days' | 'date'>) => (c.days && c.days.length ? c.days : [dowOf(fromYmd(c.date))]);

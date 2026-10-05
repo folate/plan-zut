@@ -24,6 +24,9 @@ export interface Override {
   building?: string;
   note?: string;
   cancelled?: boolean;
+  cDow?: number;
+  cFrom?: string;
+  cTo?: string;
 }
 export interface Overrides {
   single: Record<string, Override>;

@@ -25,7 +25,7 @@
       <div class="pl" class:active={me}>
         <button type="button" class="pl-main" aria-pressed={me} onclick={() => show(p.id)}>
           <Avatar {p} />
-          <span class="pl-t"><b>{p.name}</b><small>{me ? 'wyświetlany · ' : ''}{statusOf(p)}</small></span>
+          <span class="pl-t"><b>{p.name}</b><small>{me ? 'wyświetlany · ' : ''}{p.id === app.def ? 'domyślny · ' : ''}{statusOf(p)}</small></span>
           {#if me}<span class="pl-ck"><Icon name="check" /></span>{/if}
         </button>
         {#if !me}<button type="button" class="tbtn" class:on={c} aria-pressed={c} onclick={() => compare(p.id)}>{c ? 'Porównujesz' : 'Porównaj'}</button>{/if}

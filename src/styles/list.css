@@ -1,4 +1,4 @@
-.stage{position:relative;overflow:hidden;margin-inline:-6px;padding-inline:6px}
+.stage{position:relative;overflow:hidden;margin:-6px;padding:6px}
 .week{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:8px;align-items:start}
 .day{background:var(--container);border-radius:24px;padding:6px 6px 8px;min-width:0}
 .dh{display:flex;align-items:baseline;gap:8px;padding:10px 10px 8px}
