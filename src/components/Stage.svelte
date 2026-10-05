@@ -1,7 +1,7 @@
 <script lang="ts">
   import { app, step } from '../lib/app.svelte';
   import { sameDay } from '../lib/dates';
-  import { openSheet } from '../lib/ui.svelte';
+  import { openSheet, ui } from '../lib/ui.svelte';
   import ConflictBar from './ConflictBar.svelte';
   import DayList from './DayList.svelte';
   import ErrorBar from './ErrorBar.svelte';
@@ -16,7 +16,11 @@
   }
 
   let tx: number | null = null, ty = 0;
+  // Nasłuch na całym dokumencie, żeby gest działał też na pustym tle pod zajęciami.
   function touchStart(e: TouchEvent) {
+    const t = e.target as HTMLElement;
+    const onPlan = t.closest('.stage') || t === document.body || t === document.documentElement || t.classList.contains('wrap');
+    if (!onPlan || ui.sheet || ui.tour || e.touches.length !== 1) return;
     tx = e.touches[0].clientX;
     ty = e.touches[0].clientY;
   }
@@ -28,7 +32,9 @@
   }
 </script>
 
-<div class="stage {empty ? '' : animCls}" class:cmp={app.comparing} class:pv={app.viewingPreview} role="presentation" ontouchstart={touchStart} ontouchend={touchEnd}>
+<svelte:document ontouchstart={touchStart} ontouchend={touchEnd} ontouchcancel={() => (tx = null)} />
+
+<div class="stage {empty ? '' : animCls}" class:cmp={app.comparing} class:pv={app.viewingPreview}>
   {#if empty}
     <div class="notice">
       <b>{app.hasSource ? 'Plan jeszcze się nie pobrał' : 'Nie masz jeszcze planu'}</b>
