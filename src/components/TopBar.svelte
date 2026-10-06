@@ -1,23 +1,21 @@
 <script lang="ts">
   import { animate, app, gapOpts, goToDate, step } from '../lib/app.svelte';
   import { addDays, cap, dowOf, dur, fmtShort, fromYmd, hm, monday, pad, plural, sameDay, weekdayShort, ymd } from '../lib/dates';
+  import { news } from '../lib/changelog.svelte';
   import { act, freeGaps } from '../lib/events';
   import { sync } from '../lib/plans';
   import { openSheet } from '../lib/ui.svelte';
   import Avatar from './Avatar.svelte';
+  import DatePicker from './DatePicker.svelte';
   import Icon from './Icon.svelte';
   import SearchBox from './SearchBox.svelte';
 
   const v = $derived(app.view);
   const selDate = $derived(addDays(app.week, app.selDay));
 
-  function openPicker(e: MouseEvent & { currentTarget: HTMLInputElement }) {
-    try {
-      e.currentTarget.showPicker();
-    } catch {}
-  }
-  function jump(e: Event & { currentTarget: HTMLInputElement }) {
-    const v = e.currentTarget.value;
+  let picking = $state(false);
+  function jump(v: string) {
+    picking = false;
     if (v) goToDate(fromYmd(v));
   }
   const titleDesk = $derived(`${fmtShort(app.week)} – ${fmtShort(addDays(app.week, v.nDays - 1))}`);
@@ -73,7 +71,8 @@
     <div class="ttl">
       <h1 class="jump" data-tour="date" title="Skocz do daty">
         <span class="desk">{titleDesk}</span><span class="mob">{titleMob}</span><Icon name="chev" />
-        <input type="date" aria-label="Skocz do daty" value={ymd(app.mobile ? selDate : app.week)} onclick={openPicker} onchange={jump} />
+        <button type="button" aria-label="Skocz do daty" aria-haspopup="dialog" onclick={() => (picking = true)}></button>
+        {#if picking}<DatePicker title="Skocz do daty" value={ymd(app.mobile ? selDate : app.week)} onpick={jump} onclose={() => (picking = false)} />{/if}
       </h1>
       <div class="meta {status[0]}" title={app.lastErr?.msg || `${info} · ${status[1]}`}><span class="sdot"></span><span id="metaTxt">{info} · {status[1]}</span></div>
     </div>
@@ -97,6 +96,6 @@
       title={unack ? `${unack} ${plural(unack, 'nowa zmiana', 'nowe zmiany', 'nowych zmian')} w planie` : 'Zmiany w planie'}
       onclick={() => openSheet({ name: 'changes' })}
     ><Icon name="bell" /><span class="badge">{unack || ''}</span></button>
-    <button class="ib muted" type="button" data-tour="settings" aria-label="Ustawienia" title="Ustawienia" onclick={() => openSheet({ name: 'settings' })}><Icon name="gear" /></button>
+    <button class="ib muted" class:dot={news.unseen} type="button" data-tour="settings" aria-label={news.unseen ? 'Ustawienia, są nowości' : 'Ustawienia'} title="Ustawienia" onclick={() => openSheet({ name: 'settings' })}><Icon name="gear" /></button>
   </div>
 </div>

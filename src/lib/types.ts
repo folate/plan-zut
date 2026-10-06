@@ -15,6 +15,14 @@ export interface UsosEvent {
   building: string;
 }
 
+export interface CancelRule {
+  dow?: number;
+  every?: number;
+  from?: string;
+  to?: string;
+  anchor?: string;
+}
+
 export interface Override {
   dow?: number | string;
   date?: string;
@@ -27,6 +35,7 @@ export interface Override {
   cDow?: number;
   cFrom?: string;
   cTo?: string;
+  cRules?: CancelRule[];
 }
 export interface Overrides {
   single: Record<string, Override>;

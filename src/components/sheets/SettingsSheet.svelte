@@ -1,11 +1,12 @@
 <script lang="ts">
+  import { CHANGELOG, news } from '../../lib/changelog.svelte';
   import { FM, HUES, THEMES, TRANSFER } from '../../lib/constants';
   import { pad } from '../../lib/dates';
   import { isNative } from '../../lib/platform';
-  import { apkUrl, checkUpdate, download, isAndroid, release, VERSION } from '../../lib/release.svelte';
+  import { apkUrl, checkUpdate, isAndroid, release, VERSION } from '../../lib/release.svelte';
   import { setCollisions, setFm, setGridRange, setHue, setProxy, setTheme, settings } from '../../lib/settings.svelte';
   import { store } from '../../lib/storage';
-  import { closeSheet, openSheet, startTour, toast } from '../../lib/ui.svelte';
+  import { closeSheet, openSheet, pushSheet, startTour, toast } from '../../lib/ui.svelte';
   import { session, setKey } from '../../lib/usos/session.svelte';
   import ConfirmButton from '../ConfirmButton.svelte';
   import Seg from '../Seg.svelte';
@@ -26,7 +27,8 @@
     checking = true;
     const ok = await checkUpdate(true);
     checking = false;
-    toast(!ok ? 'Nie udało się sprawdzić. Spróbuj później.' : release.latest ? `Jest nowa wersja apki (${release.latest})` : 'Masz najnowszą wersję.');
+    if (ok && release.latest) toast(`Jest nowa wersja apki (${release.latest})`, 'Zobacz', () => pushSheet({ name: 'news' }));
+    else toast(ok ? 'Masz najnowszą wersję.' : 'Nie udało się sprawdzić. Spróbuj później.');
   }
 
   function wipe() {
@@ -34,6 +36,10 @@
     location.reload();
   }
 </script>
+
+{#snippet newsBtn()}
+  <button type="button" class="tbtn" class:dot={news.unseen} onclick={() => pushSheet({ name: 'news' })}>Zobacz, co się zmieniło</button>
+{/snippet}
 
 <Sheet title="Ustawienia">
   <section class="set">
@@ -115,20 +121,30 @@
     <ConfirmButton confirm="Na pewno usunąć wszystko?" onconfirm={wipe} style="justify-self:start">Usuń wszystkie dane</ConfirmButton>
   </section>
 
-  {#if apkUrl && (isNative() || isAndroid())}
+  {#if isNative()}
     <section class="set">
       <h3>Aplikacja</h3>
-      {#if isNative()}
-        <p class="hint">Wersja {VERSION}{release.latest ? `, dostępna jest ${release.latest}` : ', aktualna'}. Aktualizacja nie rusza zapisanych planów.</p>
-        <div class="row-btns">
-          {#if release.latest}<button type="button" class="tbtn" onclick={download}>Pobierz wersję {release.latest}</button>{/if}
-          <button type="button" class="tbtn" disabled={checking} onclick={check}>{checking ? 'Sprawdzam…' : 'Sprawdź aktualizacje'}</button>
-        </div>
-      {:else}
+      <p class="hint">Wersja {VERSION}{release.latest ? `, dostępna jest ${release.latest}` : ', aktualna'}. Aktualizacja nie rusza zapisanych planów.</p>
+      <div class="row-btns">
+        {@render newsBtn()}
+        {#if apkUrl}<button type="button" class="tbtn" disabled={checking} onclick={check}>{checking ? 'Sprawdzam…' : 'Sprawdź aktualizacje'}</button>{/if}
+      </div>
+    </section>
+  {:else}
+    {#if apkUrl && isAndroid()}
+      <section class="set">
+        <h3>Aplikacja</h3>
         <p class="hint">Plan ZUT jest też jako zwykła aplikacja na Androida. Dane ze strony przeniesiesz do niej kodem QR.</p>
         <a class="tbtn" style="justify-self:start" href={apkUrl}>Pobierz plik APK</a>
-      {/if}
-    </section>
+      </section>
+    {/if}
+    {#if CHANGELOG.length}
+      <section class="set">
+        <h3>Co nowego</h3>
+        <p class="hint">Ostatnie zmiany: wersja {CHANGELOG[0].v}{CHANGELOG[0].when ? ` (${CHANGELOG[0].when})` : ''}.</p>
+        <div class="row-btns">{@render newsBtn()}</div>
+      </section>
+    {/if}
   {/if}
 
   {#if author}<p class="made">made with ❤️ by <a href="https://github.com/{author}" target="_blank" rel="noopener">{author}</a></p>{/if}

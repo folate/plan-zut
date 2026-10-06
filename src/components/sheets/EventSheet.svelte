@@ -9,8 +9,10 @@
   import type { CustomEvent, RepeatKind } from '../../lib/types';
   import { closeSheet } from '../../lib/ui.svelte';
   import ConfirmButton from '../ConfirmButton.svelte';
+  import DateField from '../DateField.svelte';
   import Icon from '../Icon.svelte';
   import Sheet from '../Sheet.svelte';
+  import TimeField from '../TimeField.svelte';
 
   let { id }: { id: string | null } = $props();
 
@@ -88,7 +90,7 @@
 <Sheet title={ex ? 'Edytuj wydarzenie' : 'Nowe wydarzenie'} subtitle={ex ? '' : 'Praca, trening, korepetycje'}>
   <div class="fld"><label for="e-title">Nazwa</label><input id="e-title" type="text" maxlength="80" bind:value={title} bind:this={titleEl} /></div>
   <div class="two">
-    <div class="fld"><label for="e-date">{repeat === 'none' ? 'Data' : 'Od dnia'}</label><input id="e-date" type="date" bind:value={date} onchange={dateChanged} /></div>
+    <div class="fld"><label for="e-date">{repeat === 'none' ? 'Data' : 'Od dnia'}</label><DateField id="e-date" bind:value={date} onchange={dateChanged} /></div>
     <div class="fld">
       <label for="e-repeat">Powtarzanie</label>
       <select id="e-repeat" bind:value={repeat}>
@@ -97,8 +99,8 @@
     </div>
   </div>
   <div class="two">
-    <div class="fld"><label for="e-from">Od</label><input id="e-from" type="time" bind:value={from} /></div>
-    <div class="fld"><label for="e-to">Do</label><input id="e-to" type="time" bind:value={to} /></div>
+    <div class="fld"><label for="e-from">Od</label><TimeField id="e-from" bind:value={from} /></div>
+    <div class="fld"><label for="e-to">Do</label><TimeField id="e-to" bind:value={to} /></div>
   </div>
   {#if weekly}
     <div class="fld">
@@ -109,7 +111,7 @@
     </div>
   {/if}
   {#if repeat !== 'none'}
-    <div class="fld"><label for="e-until">Powtarzaj do (opcjonalnie)</label><input id="e-until" type="date" bind:value={until} /></div>
+    <div class="fld"><label for="e-until">Powtarzaj do (opcjonalnie)</label><DateField id="e-until" clearable placeholder="Bez końca" bind:value={until} /></div>
   {/if}
   <div class="fld"><label for="e-place">Miejsce (opcjonalnie)</label><input id="e-place" type="text" maxlength="60" bind:value={place} /></div>
   <div class="fld">

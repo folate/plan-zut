@@ -1,6 +1,6 @@
-import { OWN_KEY, REPEAT, DSHORT } from './constants';
-import { DAY, addDays, atTime, dowOf, dur, fromYmd, hm, minsBetween, monday, sameDay, ymd } from './dates';
-import type { Collisions, Conflict, CustomEvent, Gap, Override, Overrides, UsosEvent, ViewEvent } from './types';
+import { DPLUR, OWN_KEY, REPEAT, DSHORT } from './constants';
+import { DAY, addDays, atTime, cap, dowOf, dur, fmtShort, fromYmd, hm, minsBetween, monday, sameDay, ymd } from './dates';
+import type { CancelRule, Collisions, Conflict, CustomEvent, Gap, Override, Overrides, UsosEvent, ViewEvent } from './types';
 
 export const emptyOv = (): Overrides => ({ single: {}, series: {} });
 
@@ -22,16 +22,34 @@ export function applyOv(e: UsosEvent, ovs: Overrides): ViewEvent {
     if (v.room) { x.room = v.room; x.mod.add('room'); }
     if (v.building) { x.building = v.building; x.mod.add('room'); }
     if (v.note) x.note = v.note;
-    if (v === o && v.cancelled) x.cancelled = true;
     if (v === s && v.cancelled && inCancel(e, v)) x.cancelled = true;
+    if (v === o && v.cancelled != null) x.cancelled = v.cancelled;
   }
   return x;
 }
 
-function inCancel(e: UsosEvent, v: Override) {
-  const d = ymd(e.start);
-  if (v.cDow != null && v.cDow !== dowOf(e.start)) return false;
-  return !(v.cFrom && d < v.cFrom) && !(v.cTo && d > v.cTo);
+export const cancelRules = (v: Override): CancelRule[] =>
+  v.cRules?.length ? v.cRules : [{ dow: v.cDow, from: v.cFrom, to: v.cTo }];
+
+export function ruleHits(d: Date, r: CancelRule) {
+  const k = ymd(d);
+  if (r.dow != null && r.dow !== dowOf(d)) return false;
+  if ((r.from && k < r.from) || (r.to && k > r.to)) return false;
+  if (!r.anchor || !r.every || r.every < 2) return true;
+  return Math.round((+monday(d) - +monday(fromYmd(r.anchor))) / (7 * DAY)) % r.every === 0;
+}
+
+const inCancel = (e: UsosEvent, v: Override) => cancelRules(v).some((r) => ruleHits(e.start, r));
+export const cancelledByRule = (e: UsosEvent, ovs: Overrides) => !!ovs.series[e.skey]?.cancelled && inCancel(e, ovs.series[e.skey]);
+
+export function ruleText(r: CancelRule) {
+  const sh = (s: string) => fmtShort(fromYmd(s));
+  const range = r.from && r.to ? `od ${sh(r.from)} do ${sh(r.to)}` : r.from ? `od ${sh(r.from)}` : r.to ? `do ${sh(r.to)}` : '';
+  const every = r.every && r.every > 1;
+  return [
+    `${r.dow != null ? cap(DPLUR[r.dow]) : 'Wszystkie dni'} ${every ? `co ${r.every} tygodnie` : 'co tydzień'}`,
+    range || (every && r.anchor ? `licząc od ${sh(r.anchor)}` : 'cały semestr')
+  ].join(' · ');
 }
 
 export const daysOf = (c: Pick<CustomEvent, 'days' | 'date'>) => (c.days && c.days.length ? c.days : [dowOf(fromYmd(c.date))]);

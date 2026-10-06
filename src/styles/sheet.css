@@ -37,6 +37,10 @@
 .switch input::after{content:"";position:absolute;top:6px;left:6px;width:16px;height:16px;border-radius:50%;background:var(--outline);transition:transform .25s var(--ease),width .2s,height .2s,background .2s}
 .switch input:checked{background:var(--cancel);border-color:var(--cancel)}
 .switch input:checked::after{transform:translate(16px,-4px);width:24px;height:24px;background:var(--tile)}
+.rule{display:grid;gap:12px;padding:12px;border:1px solid var(--outline-v);border-radius:16px}
+.rule-h{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:600;color:var(--muted);padding-left:4px;margin:-4px -4px -8px 0}
+.rule .two:has(>.fld:only-child){grid-template-columns:minmax(0,1fr)}
+.btn.add{justify-self:start;padding:0 16px 0 12px}
 .sws{display:flex;gap:10px}
 .sws button{width:36px;height:36px;border-radius:18px;border:0;background:var(--sw);cursor:pointer;display:grid;place-items:center;color:var(--tile);transition:transform .2s var(--ease)}
 .sws button svg{width:18px;height:18px;opacity:0;transition:opacity .15s}

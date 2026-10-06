@@ -40,13 +40,38 @@ jobs:
           } > android/keystore.properties
       - name: Wersja z taga
         run: |
+          echo "V=${GITHUB_REF_NAME#v}" >> "$GITHUB_ENV"
           sed -i "s/^APP_VERSION=.*/APP_VERSION=${GITHUB_REF_NAME#v}/" .env
           sed -i "s/^APP_BUILD=.*/APP_BUILD=$GITHUB_RUN_NUMBER/" .env
       - run: npm ci
       - run: npm run build:native
       - run: chmod +x gradlew && ./gradlew assembleRelease
         working-directory: android
-      - run: cp android/app/build/outputs/apk/release/app-release.apk plan-zut.apk
-      - run: gh release create "$GITHUB_REF_NAME" plan-zut.apk --title "$GITHUB_REF_NAME" --generate-notes
+      # plan-zut.apk ma stałą nazwę, bo apka i strona pobierają go z releases/latest/download
+      - run: |
+          cp android/app/build/outputs/apk/release/app-release.apk "plan-zut-$V.apk"
+          cp "plan-zut-$V.apk" plan-zut.apk
+      - run: gh release create "$GITHUB_REF_NAME" "plan-zut-$V.apk" plan-zut.apk --title "$GITHUB_REF_NAME" --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}
+
+  bump:
+    needs: apk
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Wersja z taga do .env i package.json
+        run: |
+          V="${GITHUB_REF_NAME#v}"
+          sed -i "s/^APP_VERSION=.*/APP_VERSION=$V/" .env
+          npm version "$V" --no-git-tag-version --allow-same-version
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .env package.json package-lock.json
+          git diff --cached --quiet || git commit -m "chore: wersja $V"
+          git push

@@ -1,6 +1,7 @@
 import {
   addProfile, animate, app, dropPeerCache, hasPlan, jumpToRelevant, newId, nextCi, prof, removeProfile, setDefault, touch, updateProfile
 } from './app.svelte';
+import { initNews, newsToastDue } from './changelog.svelte';
 import { diffPlans } from './changes';
 import { PREVIEW_ID, TYPES } from './constants';
 import { plural } from './dates';
@@ -8,7 +9,7 @@ import { emptyOv } from './events';
 import { parseICS } from './ics';
 import { fetchIcs, kindOf, msgOf, type ErrKind } from './net';
 import * as planStore from './planStore';
-import { checkUpdate, download, release } from './release.svelte';
+import { checkUpdate, release } from './release.svelte';
 import { settings } from './settings.svelte';
 import { store } from './storage';
 import type { Absence, ApiSource, Change, CustomEvent, Overrides, PlanVersion, Profile } from './types';
@@ -320,6 +321,7 @@ async function finishCallbackLogin() {
 export function boot() {
   const returning = !!new URLSearchParams(location.search).get('oauth_verifier');
   const importing = location.hash.startsWith('#sync=');
+  initNews(!store.get('onboarded', false) && !app.profiles.some((p) => hasPlan(p.id)));
   loadProfile(hasPlan(app.def) ? app.def : store.get('activeProfile', app.profiles[0]?.id));
   finishCallbackLogin();
   if (importing) setTimeout(() => openSheet({ name: 'import', code: location.hash.slice(6) }), 200);
@@ -328,6 +330,9 @@ export function boot() {
   jumpToRelevant();
   if (app.hasSource && due(app.profile)) sync().catch(() => {});
   checkUpdate().then(() => {
-    if (release.latest) toast(`Jest nowa wersja apki (${release.latest})`, 'Pobierz', download);
+    if (importing || returning) return;
+    const show = () => openSheet({ name: 'news' });
+    if (release.latest) toast(`Jest nowa wersja apki (${release.latest})`, 'Zobacz', show);
+    else if (newsToastDue()) toast('Nowości w apce', 'Zobacz', show);
   });
 }

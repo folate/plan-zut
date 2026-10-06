@@ -9,6 +9,7 @@
   import ExportSheet from './sheets/ExportSheet.svelte';
   import HistorySheet from './sheets/HistorySheet.svelte';
   import ImportSheet from './sheets/ImportSheet.svelte';
+  import NewsSheet from './sheets/NewsSheet.svelte';
   import PlansSheet from './sheets/PlansSheet.svelte';
   import ProfileSheet from './sheets/ProfileSheet.svelte';
   import SearchOverlay from './sheets/SearchOverlay.svelte';
@@ -34,6 +35,7 @@
       {:else if s.name === 'welcome'}<WelcomeSheet />
       {:else if s.name === 'account'}<AccountSheet target={s.target} />
       {:else if s.name === 'settings'}<SettingsSheet />
+      {:else if s.name === 'news'}<NewsSheet />
       {:else if s.name === 'search'}<SearchSheet />
       {:else if s.name === 'searchOverlay'}<SearchOverlay />
       {:else if s.name === 'export'}<ExportSheet />

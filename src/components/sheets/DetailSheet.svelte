@@ -2,12 +2,12 @@
   import { app, goToDate, peerData } from '../../lib/app.svelte';
   import { changeLine, evFromJson, ghostsOf } from '../../lib/changes';
   import { KIND, shortB, typeOf, typeStyle } from '../../lib/constants';
-  import { cap, fmtDay, fmtFull, hm, pad } from '../../lib/dates';
-  import { applyOv } from '../../lib/events';
+  import { cap, fmtDay, fmtFull, fmtShort, hm, pad } from '../../lib/dates';
+  import { applyOv, cancelledByRule, cancelRules, ruleText } from '../../lib/events';
   import { msgOf, NetError } from '../../lib/net';
   import { patternOf } from '../../lib/pattern';
   import { isAbsent, toggleAbsence } from '../../lib/absences';
-  import { openPreview, saveAbsences } from '../../lib/plans';
+  import { openPreview, saveAbsences, saveOverrides } from '../../lib/plans';
   import type { ViewEvent } from '../../lib/types';
   import { closeSheet, openSheet, toast } from '../../lib/ui.svelte';
   import { api, apiStatus } from '../../lib/usos/api';
@@ -42,7 +42,12 @@
   const srv = app.changes.filter((c) => c.ev.uid === uid).slice(-3);
 
   const descs: string[] = [];
-  if (cur?.cancelled) descs.push(ghost ? 'Zajęcia zniknęły z planu w USOS (prawdopodobnie odwołane).' : 'Oznaczone przez Ciebie jako odwołane.');
+  const byRule = !!live && cancelledByRule(live, app.ov);
+  const seriesOv = live && app.ov.series[live.skey];
+  const rules = seriesOv?.cancelled ? cancelRules(seriesOv).map(ruleText) : [];
+  const kept = live ? app.usos.filter((e) => e.skey === live.skey && app.ov.single[e.uid]?.cancelled === false && cancelledByRule(e, app.ov)).sort((x, y) => +x.start - +y.start) : [];
+  if (cur?.cancelled) descs.push(ghost ? 'Zajęcia zniknęły z planu w USOS (prawdopodobnie odwołane).' : byRule ? 'Odwołane przez regułę ustawioną dla całej grupy.' : 'Oznaczone przez Ciebie jako odwołane.');
+  else if (byRule) descs.push('Odbywają się mimo reguły odwołań (wyjątek ustawiony przez Ciebie).');
   if (cur?.orig) {
     const o = cur.orig;
     if (cur.mod.has('day')) descs.push(`Przeniesione przez Ciebie z ${fmtDay(o.start)}.`);
@@ -81,6 +86,15 @@
       loadingPeople = false;
     }
   }
+  function setCancelled(v: boolean) {
+    const single = { ...app.ov.single }, n = { ...single[uid] };
+    if (v === byRule) delete n.cancelled;
+    else n.cancelled = v;
+    if (Object.keys(n).length) single[uid] = n;
+    else delete single[uid];
+    saveOverrides({ single, series: app.ov.series });
+    openSheet({ name: 'detail', uid });
+  }
   function jump(d: Date) {
     goToDate(d);
     closeSheet();
@@ -104,6 +118,11 @@
     </div>
     {#if descs.length}
       <div class="det-note">{#each descs as d, i}{#if i}<br />{/if}{d}{/each}</div>
+    {/if}
+    {#if live && !readOnly && (cur.cancelled || byRule)}
+      <button type="button" class="tbtn" style="justify-self:start" onclick={() => setCancelled(!cur.cancelled)}>
+        {cur.cancelled ? 'Te zajęcia jednak się odbywają' : 'Odwołaj ten termin z powrotem'}
+      </button>
     {/if}
     {#if srv.length}
       <div class="det-srv">
@@ -155,6 +174,15 @@
             {absent ? 'Cofnij nieobecność' : 'Nie było mnie'}
           </button>
         </div>
+      </section>
+    {/if}
+
+    {#if rules.length}
+      <section class="det-sec">
+        <h3>Reguły odwołań</h3>
+        {#each rules as r}<p class="det-pat">{r}</p>{/each}
+        {#if kept.length}<p class="det-pat">Wyjątki, odbywają się mimo reguł: {kept.map((e) => fmtShort(e.start)).join(', ')}</p>{/if}
+        <p class="hint">Dotyczą wszystkich zajęć tej grupy. Zmienisz je w „Edytuj”, a pojedynczy termin przywrócisz po kliknięciu go w planie.</p>
       </section>
     {/if}
 

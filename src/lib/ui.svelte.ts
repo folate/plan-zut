@@ -13,6 +13,7 @@ export type SheetSpec =
   | { name: 'source'; target: string | null }
   | { name: 'account'; target: string | null }
   | { name: 'settings' }
+  | { name: 'news' }
   | { name: 'search' }
   | { name: 'searchOverlay' }
   | { name: 'export' }

@@ -2,7 +2,7 @@
   "name": "plan-zut",
   "description": "Przeglądarka planu zajęć z USOS ZUT działająca w całości w przeglądarce",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.3",
   "type": "module",
   "engines": {
     "node": ">=22.12"

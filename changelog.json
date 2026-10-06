@@ -1,0 +1,28 @@
+[
+  {
+    "v": "1.1.0",
+    "when": "październik 2026",
+    "items": [
+      {
+        "icon": "cal",
+        "title": "Odwoływanie zajęć według reguł",
+        "desc": "W edycji zajęć, przy „Wszystkie zajęcia tej grupy”, dodasz kilka reguł naraz, np. wtorki co 2 tygodnie i piątki co tydzień. Każda może mieć własny zakres dat."
+      },
+      {
+        "icon": "check",
+        "title": "Wyjątki od reguł",
+        "desc": "Reguły widać w szczegółach zajęć. Jeśli któryś odwołany termin jednak się odbywa, przywrócisz go tam jednym przyciskiem."
+      },
+      {
+        "icon": "own",
+        "title": "Nowy wybór daty i godziny",
+        "desc": "Kalendarz i zegar wyglądają tak samo na każdym urządzeniu. Godzinę wybierzesz z tarczy albo wpiszesz z klawiatury."
+      },
+      {
+        "icon": "bell",
+        "title": "Lista nowości",
+        "desc": "Po aktualizacji apka da znać, co się zmieniło, a przed pobraniem nowej wersji pokaże, co ona wnosi. Listę znajdziesz też na dole Ustawień."
+      }
+    ]
+  }
+]
