@@ -44,3 +44,18 @@ export function parseICS(text: string): UsosEvent[] {
 
 export const icsEsc = (t: unknown) => String(t || '').replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/([,;])/g, '\\$1');
 export const icsDate = (s: string) => s.replace(/[-:]/g, '').replace(' ', 'T');
+
+const KEEP_PAST = 200 * 864e5;
+export function keepPast(oldT: string | null, newT: string, now = new Date()): string {
+  if (!oldT || oldT === newT) return newT;
+  const sig = (e: UsosEvent) => `${e.skey}|${+e.start}`;
+  const have = new Set(parseICS(newT).flatMap((e) => [e.uid, sig(e)]));
+  const keep = (oldT.match(/BEGIN:VEVENT[\s\S]*?END:VEVENT/g) || []).filter((b) => {
+    const e = parseICS(b)[0];
+    if (!e || e.end >= now || +now - +e.end > KEEP_PAST || have.has(e.uid) || have.has(sig(e))) return false;
+    have.add(e.uid);
+    return true;
+  });
+  const i = newT.lastIndexOf('END:VCALENDAR');
+  return keep.length && i >= 0 ? newT.slice(0, i) + keep.join('\n') + '\n' + newT.slice(i) : newT;
+}

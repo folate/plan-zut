@@ -11,7 +11,7 @@
   import Toast from './components/Toast.svelte';
   import TopBar from './components/TopBar.svelte';
   import { app, step } from './lib/app.svelte';
-  import { boot, closePreview, retryAfterOutage } from './lib/plans';
+  import { autoSync, boot, closePreview, ensureWeek, retryAfterOutage } from './lib/plans';
   import { isNative } from './lib/platform';
   import Tour from './components/Tour.svelte';
   import { backSheet, closeSheet, endTour, openSheet, startTour, tourSeen, ui } from './lib/ui.svelte';
@@ -33,7 +33,13 @@
   }
 
   $effect(() => {
-    ensureMeta(app.view.all);
+    ensureMeta([...app.usos, ...app.view.all]);
+  });
+
+  $effect(() => {
+    const src = app.lazySrc, week = app.week;
+    const t = setTimeout(() => void ensureWeek(src, week), 500);
+    return () => clearTimeout(t);
   });
 
   $effect(() => {
@@ -41,6 +47,12 @@
     const t = setTimeout(startTour, 700);
     return () => clearTimeout(t);
   });
+
+  function onVisible() {
+    if (document.visibilityState !== 'visible') return;
+    retryAfterOutage(['down', 'timeout', 'offline']);
+    autoSync();
+  }
 
   function onKey(e: KeyboardEvent) {
     if (ui.tour) return;
@@ -57,7 +69,7 @@
 <svelte:window ononline={() => retryAfterOutage(['offline', 'down', 'timeout'])} />
 <svelte:document
   onkeydown={onKey}
-  onvisibilitychange={() => document.visibilityState === 'visible' && retryAfterOutage(['down', 'timeout', 'offline'])}
+  onvisibilitychange={onVisible}
 />
 
 <div class="wrap">

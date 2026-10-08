@@ -3,6 +3,8 @@
 .ttl h1{margin:0;font-size:22px;font-weight:500;font-variation-settings:"opsz" 28;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ttl .meta{font-size:12.5px;color:var(--muted);display:flex;gap:6px;align-items:center;min-width:0}
 .ttl .meta #metaTxt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.ttl .meta .st{flex:none;white-space:nowrap;font-weight:600}
+.ttl .meta .sdot{flex:none}
 .ttl .meta .sdot{width:6px;height:6px;border-radius:50%;background:var(--ok)}
 .ttl .meta.err{color:var(--cancel)}.ttl .meta.err .sdot{background:var(--cancel)}
 .ttl .meta.idle .sdot{background:var(--outline)}

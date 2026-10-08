@@ -173,7 +173,7 @@ Klucz i sekret warto sobie zapisać. USOS nie pokazuje ich drugi raz, a są potr
 
 Aplikacja stara się nie męczyć USOS-a:
 
-- plan z linku odświeża się sam najwyżej co 10 minut, plan z konta co 6 godzin
+- częstotliwość automatycznego odświeżania ustawia się w Ustawieniach (domyślnie co 3 godziny): po zalogowaniu przez USOS najczęściej co 10 minut, plan z linku najczęściej co godzinę; odstęp krótszy niż godzina działa przy otwarciu apki, a otwarta apka odświeża się w tle co godzinę
 - ręczne odświeżanie działa nie częściej niż co 30 sekund
 - wyszukiwarka czeka 1,2 s po ostatnim znaku (albo na Enter) i pamięta już pobrane wyniki
 - zapytania o grupy idą najwyżej po 3 naraz

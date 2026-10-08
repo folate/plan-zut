@@ -1,0 +1,27 @@
+.mk-row{align-items:center;padding:12px 8px 12px 14px}
+.mk-row.dim .ver-t{opacity:.55}
+.mk-row .ver-t b small{font-weight:500}
+.mk-row .ver-t b .tag{font-weight:600}
+.mk-when{font:500 14px var(--mono)}
+.mk-grp{margin:8px 0 0;padding-left:4px;font-size:12px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+.mk-grp.mine{color:var(--primary)}
+.mk-go{justify-self:stretch;display:flex;align-items:center;justify-content:center}
+.mk-st{font-size:12.5px;font-weight:600;color:var(--ok)}
+.mk-st.bad{color:var(--cancel)}
+.mk-st.old{color:var(--muted)}
+.mk-step{display:grid;justify-items:center;gap:2px;flex:none}
+.mk-step>span{display:flex;align-items:center}
+.mk-step b{font:500 13px var(--mono);min-width:38px;text-align:center}
+.mk-step small{font-size:11px;color:var(--muted)}
+.mk-step .ib{width:32px;height:32px;font-size:18px;line-height:1}
+.mk-step .ib svg{width:18px;height:18px}
+.mk-warn{padding:20px 24px 8px;display:grid;gap:10px}
+.mk-warn b{font-size:18px;font-weight:600}
+.mk-warn p{margin:0;font-size:14px;line-height:1.45;color:var(--muted)}
+.oc:disabled{cursor:default}
+.oc i{font-style:normal;opacity:.6;margin-right:6px}
+.chip.mkchip{padding:0 12px}
+.mkl{display:inline-flex;align-items:center;height:20px;padding:0 7px;border-radius:6px;background:var(--tfg);color:var(--tbg);font-size:11.5px;font-weight:700;white-space:nowrap}
+.bk .ty .mkl{height:18px;margin-right:2px}
+.bk.mk,.it.mk{box-shadow:inset 0 0 0 2px var(--tfg)}
+.mk-add{justify-self:start;margin-top:6px}

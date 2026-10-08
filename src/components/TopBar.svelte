@@ -74,7 +74,7 @@
         <button type="button" aria-label="Skocz do daty" aria-haspopup="dialog" onclick={() => (picking = true)}></button>
         {#if picking}<DatePicker title="Skocz do daty" value={ymd(app.mobile ? selDate : app.week)} onpick={jump} onclose={() => (picking = false)} />{/if}
       </h1>
-      <div class="meta {status[0]}" title={app.lastErr?.msg || `${info} · ${status[1]}`}><span class="sdot"></span><span id="metaTxt">{info} · {status[1]}</span></div>
+      <div class="meta {status[0]}" title={app.lastErr?.msg || `${info} · ${status[1]}`}><span class="sdot"></span><span class="st">{status[1]}</span>{#if !app.mobile || app.comparing}<span id="metaTxt">· {info}</span>{/if}</div>
     </div>
     {#if !onToday}<button class="tbtn mob-only" type="button" onclick={today}>Dziś</button>{/if}
     <div class="nav" data-tour="nav">

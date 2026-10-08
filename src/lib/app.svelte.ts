@@ -44,6 +44,8 @@ class AppState {
   custom = $state.raw<CustomEvent[]>([]);
   ov = $state.raw<Overrides>(emptyOv());
   absences = $state.raw<Absence[]>([]);
+  makeups = $state.raw<UsosEvent[]>([]);
+  lazy = $state.raw<Record<string, UsosEvent[]>>({});
   preview = $state.raw<Preview | null>(null);
   viewingPreview = $state(false);
 
@@ -65,6 +67,16 @@ class AppState {
   hasSource = $derived(!!(this.profile && (this.profile.url || this.profile.api)));
   synced = $derived(this.profile?.synced ?? null);
   comparing = $derived(!!this.cmp);
+  lazySrc = $derived.by(() => {
+    if (this.viewingPreview) return this.preview?.p.api?.kind === 'room' ? `room:${this.preview.p.api.room_id}` : '';
+    return this.profile?.api?.kind === 'account' ? `user:${this.profile.id}` : '';
+  });
+  lazyNow = $derived.by(() => {
+    const list = this.lazySrc ? this.lazy[`${this.lazySrc}|${+this.week}`] : undefined;
+    if (!list?.length) return [];
+    const have = new Set(this.usos.map((e) => e.uid));
+    return list.filter((e) => !have.has(e.uid));
+  });
 
   changes = $derived.by((): Change[] => {
     void this.rev;
@@ -72,12 +84,12 @@ class AppState {
   });
   peer = $derived.by(() => (this.cmp && prof(this.cmp) ? peerData(this.cmp) : null));
   bColors = $derived.by(() => {
-    const names = [...this.usos, ...(this.peer?.usos ?? [])].map((e) => e.building).filter(Boolean);
+    const names = [...this.usos, ...this.makeups, ...this.lazyNow, ...(this.peer?.usos ?? [])].map((e) => e.building).filter(Boolean);
     return new Map([...new Set(names)].map((b, i) => [b, `var(--b${(i % 6) + 1})`]));
   });
   view = $derived.by((): WeekView =>
     buildWeek({
-      ws: this.week, usos: this.usos, ov: this.ov, custom: this.custom,
+      ws: this.week, usos: this.usos, extra: [...(this.viewingPreview ? [] : this.makeups), ...this.lazyNow], ov: this.ov, custom: this.custom,
       changes: this.viewingPreview ? [] : this.changes,
       absent: new Set(this.viewingPreview ? [] : this.absences.map((a) => a.uid)),
       peer: this.peer, comparing: this.comparing,

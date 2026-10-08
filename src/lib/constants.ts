@@ -61,6 +61,11 @@ export const FM: [FilterMode, string, string][] = [
 export type Theme = 'system' | 'light' | 'dark';
 export const THEMES: [Theme, string][] = [['system', 'Systemowy'], ['light', 'Jasny'], ['dark', 'Ciemny']];
 export const TRANSFER: [string, string][] = [['0', 'Wył.'], ['5', '5 min'], ['10', '10 min'], ['15', '15 min'], ['20', '20 min']];
+export const AUTO_SYNC: [number, string][] = [
+  [10, 'Co 10 minut'], [30, 'Co 30 minut'], [60, 'Co godzinę'], [180, 'Co 3 godziny'], [360, 'Co 6 godzin'], [720, 'Co 12 godzin'], [0, 'Tylko ręcznie']
+];
+export const SYNC_MIN_ACCOUNT = 10;
+export const SYNC_MIN_LINK = 60;
 export const HUES: [string, number][] = [
   ['Czerwień', 25], ['Pomarańcz', 55], ['Oliwka', 110], ['Zieleń', 150], ['Morski', 200], ['Granat', 255], ['Fiolet', 305]
 ];

@@ -7,6 +7,7 @@ export type SheetSpec =
   | { name: 'event'; id: string | null }
   | { name: 'changes' }
   | { name: 'absences' }
+  | { name: 'makeup'; uid?: string }
   | { name: 'detail'; uid: string }
   | { name: 'history'; id: string }
   | { name: 'welcome' }

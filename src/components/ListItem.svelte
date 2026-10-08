@@ -93,7 +93,7 @@
   </button>
 {:else}
   <div
-    class={cls} class:cancel={e.cancelled} class:srvchg={!!e.srv} role="button" tabindex="0" style="--i:{i};{typeStyle(t.k)}"
+    class={cls} class:cancel={e.cancelled} class:srvchg={!!e.srv} class:mk={e.makeup} role="button" tabindex="0" style="--i:{i};{typeStyle(t.k)}"
     aria-label="{t.n}: {e.name}, {hm(e.start)}–{hm(e.end)}" onclick={openDetail} onkeydown={onKey}
   >
     {@render times(e.mod.has('time') || e.mod.has('day'))}
@@ -101,6 +101,7 @@
       <span class="subj">{e.name}</span>
       {@render state()}
       <span class="sub">
+        {#if e.makeup}<span class="mkl">Odrabianie</span>{/if}
         <span class="tag">{t.n}</span>
         {#if e.room}<span class="room" class:chg={e.mod.has('room')}>{e.room}</span>{/if}
         {#if e.building}<span class="bld" title={e.building}><i style="--bc:{app.bColors.get(e.building)}"></i>{shortB(e.building)}</span>{/if}

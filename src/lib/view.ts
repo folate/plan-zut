@@ -6,6 +6,7 @@ import type { Change, Collisions, CustomEvent, Overrides, PeerData, UsosEvent, V
 export interface WeekInput {
   ws: Date;
   usos: UsosEvent[];
+  extra: UsosEvent[];
   ov: Overrides;
   custom: CustomEvent[];
   changes: Change[];
@@ -24,6 +25,7 @@ export function buildWeek(o: WeekInput): WeekView {
 
   const mine = [
     ...o.usos.map((e) => applyOv(e, o.ov)).filter(inWeek).map((e) => ((e.srv = srv.get(e.uid!)), (e.absent = o.absent.has(e.uid!)), e)),
+    ...o.extra.map((e) => applyOv(e, o.ov)).filter(inWeek),
     ...ghostsOf(o.changes, o.usos).filter(inWeek),
     ...customForWeek(ws, o.custom)
   ];

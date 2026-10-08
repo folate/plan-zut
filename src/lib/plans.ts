@@ -2,21 +2,21 @@ import {
   addProfile, animate, app, dropPeerCache, hasPlan, jumpToRelevant, newId, nextCi, prof, removeProfile, setDefault, touch, updateProfile
 } from './app.svelte';
 import { initNews, newsToastDue } from './changelog.svelte';
-import { diffPlans } from './changes';
-import { PREVIEW_ID, TYPES } from './constants';
-import { plural } from './dates';
+import { diffPlans, evFromJson, evToJson } from './changes';
+import { PREVIEW_ID, SYNC_MIN_ACCOUNT, SYNC_MIN_LINK, TYPES } from './constants';
+import { addDays, monday, plural } from './dates';
 import { emptyOv } from './events';
-import { parseICS } from './ics';
+import { keepPast, parseICS } from './ics';
 import { fetchIcs, kindOf, msgOf, type ErrKind } from './net';
 import * as planStore from './planStore';
 import { checkUpdate, release } from './release.svelte';
 import { settings } from './settings.svelte';
 import { store } from './storage';
-import type { Absence, ApiSource, Change, CustomEvent, Overrides, PlanVersion, Profile } from './types';
+import type { Absence, ApiSource, Change, CustomEvent, Overrides, PlanVersion, Profile, UsosEvent } from './types';
 import { openSheet, toast } from './ui.svelte';
 import { api, apiStatus } from './usos/api';
 import { loginFinish } from './usos/oauth';
-import { discoverGroups, fetchApiPlan, pushRecent, type SearchItem } from './usos/plans';
+import { discoverGroups, fetchApiPlan, pushRecent, ROOM_WEEKS, weekEvents, type SearchItem } from './usos/plans';
 import { session, setAuth } from './usos/session.svelte';
 
 export const changesOf = (id: string) => (void app.rev, planStore.getChanges(id));
@@ -50,6 +50,11 @@ export function saveAbsences(list: Absence[]) {
   app.absences = list;
   if (app.pid) planStore.setAbsences(app.pid, list);
 }
+const makeupsOf = (id: string): UsosEvent[] => planStore.getMakeups(id).map((j) => ({ ...evFromJson(j), unit: j.unit, makeup: true }));
+export function saveMakeups(list: UsosEvent[]) {
+  app.makeups = list;
+  if (app.pid) planStore.setMakeups(app.pid, list.map((e) => ({ ...evToJson(e), unit: e.unit })));
+}
 export function saveCustom(list: CustomEvent[]) {
   app.custom = list;
   if (app.pid) planStore.setCustom(app.pid, list);
@@ -65,6 +70,7 @@ export function loadProfile(id: string | null | undefined) {
     app.custom = [];
     app.ov = emptyOv();
     app.absences = [];
+    app.makeups = [];
     app.usos = [];
     return;
   }
@@ -74,6 +80,7 @@ export function loadProfile(id: string | null | undefined) {
   app.custom = planStore.getCustom(p.id);
   app.ov = planStore.getOverrides(p.id);
   app.absences = planStore.getAbsences(p.id);
+  app.makeups = makeupsOf(p.id);
   planStore.tidyVersions(p.id, p.synced);
   const ics = planStore.getIcs(p.id);
   app.usos = ics ? parseICS(ics) : [];
@@ -109,21 +116,48 @@ export function deleteProfile(id: string) {
   animate();
 }
 
-const API_TTL = 6 * 3600e3;
-const LINK_TTL = 10 * 60e3;
 const FRESH = 30e3;
-export const due = (p: Profile | undefined) =>
-  !!p && (!p.synced || Date.now() - p.synced > (p.api ? API_TTL : LINK_TTL) || !planStore.getIcs(p.id));
+export const syncMin = (p?: Profile) => (session.auth && (!p || p.api) ? SYNC_MIN_ACCOUNT : SYNC_MIN_LINK);
+const stale = (p: Profile, bg: boolean) =>
+  settings.autoSync > 0 && Date.now() - (p.synced || 0) > Math.max(settings.autoSync, bg ? SYNC_MIN_LINK : syncMin(p)) * 60e3;
+export const due = (p: Profile | undefined, bg = false) => !!p && (!p.synced || !planStore.getIcs(p.id) || stale(p, bg));
 
 const fetchProfileIcs = (p: Profile) => (p.api ? fetchApiPlan(p.api) : fetchIcs(p.url || '', settings.proxy));
 
-function applyFetched(id: string, text: string) {
-  const at = Date.now();
-  const changed = recordChanges(id, planStore.getIcs(id), text);
+function applyFetched(id: string, fetched: string) {
+  const at = Date.now(), old = planStore.getIcs(id);
+  const text = keepPast(old, fetched);
+  const changed = recordChanges(id, old, text);
   storeIcs(id, text, at);
   updateProfile(id, { synced: at });
   if (app.pid === id && !app.viewingPreview) app.usos = parseICS(text);
   return changed;
+}
+
+const lazyLoading = new Set<string>(), lazyFailed = new Set<string>();
+export async function ensureWeek(src: string, week: Date) {
+  const key = `${src}|${+week}`;
+  if (!src || key in app.lazy || lazyLoading.has(key) || lazyFailed.has(key)) return;
+  if (src.startsWith('room:')) {
+    const m = monday(new Date());
+    if (week >= m && week < addDays(m, ROOM_WEEKS * 7)) return;
+  } else {
+    if (!session.auth || !app.usos.length) return;
+    const first = monday(new Date(Math.min(...app.usos.map((e) => +e.start))));
+    if (week >= first) return;
+  }
+  lazyLoading.add(key);
+  const mine = !app.busy;
+  if (mine) app.busy = true;
+  try {
+    app.lazy = { ...app.lazy, [key]: await weekEvents(src, week) };
+  } catch (e) {
+    lazyFailed.add(key);
+    toast(msgOf(e));
+  } finally {
+    lazyLoading.delete(key);
+    if (mine) app.busy = false;
+  }
 }
 
 let retryTimer: ReturnType<typeof setTimeout> | undefined;
@@ -135,6 +169,10 @@ function scheduleRetry(kind: ErrKind) {
     if (document.visibilityState === 'visible') sync().catch(() => {});
     else app.retryDelay = 0;
   }, app.retryDelay);
+}
+export function autoSync(bg = false) {
+  if (document.visibilityState !== 'visible' || app.busy || app.lastErr || app.viewingPreview) return;
+  if (app.hasSource && due(app.profile, bg)) sync().catch(() => {});
 }
 export function retryNow() {
   app.retryDelay = 0;
@@ -258,10 +296,15 @@ export async function openPreview(it: SearchItem) {
     if (it.groups && it.groups.length === 1) name += ` · gr. ${it.groups[0].group_number}`;
   } else if (it.kind === 'group') src = { kind: 'groups', groups: [{ unit_id: it.unit!, group_number: it.group! }] };
   else if (it.kind === 'common') src = { kind: 'common', user_id: it.id! };
+  else if (it.kind === 'room') {
+    src = { kind: 'room', room_id: it.id! };
+    if (it.sub) name += ` · ${it.sub}`;
+  }
   else src = { kind: 'staff', user_id: it.id! };
   const info: { staffName?: string } = {};
   const ics = await fetchApiPlan(src, info);
   if (it.kind === 'staff' && info.staffName && /^Prowadzący nr/.test(name)) name = info.staffName;
+  if (it.kind === 'room') pushRecent({ kind: 'room', id: it.id, name: it.name, sub: it.sub });
   if (it.kind === 'staff' || it.kind === 'course')
     pushRecent({ kind: it.kind, id: it.id, name: it.kind === 'staff' ? name : label, sub: it.kind === 'staff' ? it.sub : it.id, code: it.code });
   enterPreview(name, ics, src);
@@ -329,6 +372,7 @@ export function boot() {
     setTimeout(() => openSheet({ name: 'welcome' }), 300);
   jumpToRelevant();
   if (app.hasSource && due(app.profile)) sync().catch(() => {});
+  setInterval(() => autoSync(true), 60e3);
   checkUpdate().then(() => {
     if (importing || returning) return;
     const show = () => openSheet({ name: 'news' });

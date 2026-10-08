@@ -1,14 +1,16 @@
 <script lang="ts">
   import { CHANGELOG, news } from '../../lib/changelog.svelte';
-  import { FM, HUES, THEMES, TRANSFER } from '../../lib/constants';
+  import { AUTO_SYNC, FM, HUES, SYNC_MIN_ACCOUNT, SYNC_MIN_LINK, THEMES, TRANSFER } from '../../lib/constants';
   import { pad } from '../../lib/dates';
+  import { syncMin } from '../../lib/plans';
   import { isNative } from '../../lib/platform';
   import { apkUrl, checkUpdate, isAndroid, release, VERSION } from '../../lib/release.svelte';
-  import { setCollisions, setFm, setGridRange, setHue, setProxy, setTheme, settings } from '../../lib/settings.svelte';
+  import { setAutoSync, setCollisions, setFm, setGridRange, setHue, setProxy, setTheme, settings } from '../../lib/settings.svelte';
   import { store } from '../../lib/storage';
   import { closeSheet, openSheet, pushSheet, startTour, toast } from '../../lib/ui.svelte';
   import { session, setKey } from '../../lib/usos/session.svelte';
   import ConfirmButton from '../ConfirmButton.svelte';
+  import Icon from '../Icon.svelte';
   import Seg from '../Seg.svelte';
   import Sheet from '../Sheet.svelte';
   import Switch from '../Switch.svelte';
@@ -17,10 +19,24 @@
   const FROM_HOURS = [5, 6, 7, 8, 9, 10, 11, 12];
   const TO_HOURS = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23];
 
-  const author = (import.meta.env.VITE_GITHUB_URL || '').match(/github[.]com[/]([^/]+)/)?.[1];
+  const github = import.meta.env.VITE_GITHUB_URL;
+  const author = (github || '').match(/github[.]com[/]([^/]+)/)?.[1];
 
   let key = $state(session.key.key), secret = $state(session.key.secret);
   const saveKey = () => setKey({ key: key.trim(), secret: secret.trim() });
+
+  const syncOpts = $derived(AUTO_SYNC.filter(([m]) => !m || m >= syncMin()));
+  const syncVal = $derived(settings.autoSync && Math.max(settings.autoSync, syncMin()));
+
+  let syncNote = $state(0);
+  function pickSync(min: number) {
+    setAutoSync(min);
+    if (min && min < SYNC_MIN_LINK) syncNote = min;
+  }
+  function portal(node: HTMLElement) {
+    document.body.appendChild(node);
+    return { destroy: () => node.remove() };
+  }
 
   let checking = $state(false);
   async function check() {
@@ -98,6 +114,20 @@
   <section class="set">
     <h3>Pobieranie</h3>
     <div class="fld">
+      <label for="s-sync">Automatyczna aktualizacja planu</label>
+      <select id="s-sync" value={syncVal} onchange={(e) => pickSync(+e.currentTarget.value)}>
+        {#each syncOpts as [m, label] (m)}<option value={m}>{label}</option>{/each}
+      </select>
+      <p class="hint">
+        {#if session.auth}
+          Plan z konta USOS może odświeżać się nawet co {SYNC_MIN_ACCOUNT} minut, a plan z linku do kalendarza najczęściej co godzinę. Odstęp krótszy niż godzina działa przy otwarciu apki; gdy jest cały czas otwarta, plan odświeża się w tle co godzinę.
+        {:else}
+          Bez logowania plan odświeża się najczęściej co godzinę. Po zalogowaniu przez USOS wybierzesz nawet co {SYNC_MIN_ACCOUNT} minut.
+        {/if}
+        Ręczne odświeżanie działa zawsze.
+      </p>
+    </div>
+    <div class="fld">
       <label for="s-proxy">Serwer pośredniczący</label>
       <input id="s-proxy" type="url" placeholder={'https://twoj-proxy.workers.dev/?url={url}'} value={settings.proxy} onchange={(e) => setProxy(e.currentTarget.value.trim())} />
     </div>
@@ -148,9 +178,26 @@
   {/if}
 
   {#if author}<p class="made">made with ❤️ by <a href="https://github.com/{author}" target="_blank" rel="noopener">{author}</a></p>{/if}
+  {#if github}<a class="btn" style="justify-self:center" href={github} target="_blank" rel="noopener"><Icon name="github" />GitHub</a>{/if}
 
   {#snippet footer()}
     <button class="btn sp" type="button" onclick={startTour}>Pokaż samouczek</button>
     <button class="btn fill" type="button" onclick={closeSheet}>Gotowe</button>
   {/snippet}
 </Sheet>
+
+{#if syncNote}
+  <div use:portal>
+    <div class="dp-scrim" role="presentation" onclick={() => (syncNote = 0)}></div>
+    <div class="dp" role="alertdialog" aria-modal="true" aria-label="Odświeżanie co {syncNote} minut">
+      <div class="mk-warn">
+        <b>Odświeżanie co {syncNote} minut</b>
+        <p>Plan pobierze się od razu, gdy otworzysz apkę albo do niej wrócisz, a od ostatniego pobrania minęło co najmniej {syncNote} minut.</p>
+        <p>Gdy apka jest cały czas otwarta, plan odświeża się w tle co godzinę, żeby nie obciążać USOS. W każdej chwili możesz też odświeżyć go ręcznie.</p>
+      </div>
+      <div class="dp-act">
+        <button class="btn fill" type="button" onclick={() => (syncNote = 0)}>Rozumiem</button>
+      </div>
+    </div>
+  </div>
+{/if}

@@ -23,8 +23,9 @@
     return [d.add ? `+${d.add} nowych` : '', d.rem ? `−${d.rem} usuniętych` : '', d.chg ? `${d.chg} zmienionych` : ''].filter(Boolean).join(' · ') || 'bez zmian w zajęciach';
   }
   function preview(v: PlanVersion) {
+    const name = `${p!.name} · ${fmtAt(v.at)}`;
     closeSheet();
-    enterPreview(`${p!.name} · ${fmtAt(v.at)}`, v.ics, null);
+    enterPreview(name, v.ics, null);
   }
   const removeVersion = (v: PlanVersion) => setVersions(id, versionsOf(id).filter((x) => x.at !== v.at));
   function clearVersions() {

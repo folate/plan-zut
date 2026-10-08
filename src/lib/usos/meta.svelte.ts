@@ -21,6 +21,7 @@ export function putMeta(groups: any[], ensureKeys: string[] = []) {
     next[gmKey(u, n)] = {
       l: (g.lecturers || []).map((x: any) => ({ id: String(x.id), n: `${x.first_name || ''} ${x.last_name || ''}`.trim() })),
       ct: pl(g.class_type),
+      n: g.participants ? g.participants.length : GM[gmKey(u, n)]?.n,
       t: Date.now()
     };
   }

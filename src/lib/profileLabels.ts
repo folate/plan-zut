@@ -7,6 +7,7 @@ export function apiLabel(p: Profile) {
   if (p.api.kind === 'staff') return 'prowadzący';
   if (p.api.kind === 'account') return 'konto USOS';
   if (p.api.kind === 'common') return 'wspólne zajęcia';
+  if (p.api.kind === 'room') return 'sala';
   const n = (p.api.groups || []).length;
   return `${n} ${plural(n, 'grupa', 'grupy', 'grup')} z USOS`;
 }

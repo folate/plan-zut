@@ -13,6 +13,7 @@ export interface UsosEvent {
   end: Date;
   room: string;
   building: string;
+  makeup?: boolean;
 }
 
 export interface CancelRule {
@@ -72,6 +73,7 @@ export type ApiSource =
   | { kind: 'groups'; course_id?: string; groups: GroupRef[] }
   | { kind: 'staff'; user_id: string }
   | { kind: 'common'; user_id: string }
+  | { kind: 'room'; room_id: string }
   | { kind: 'account' };
 
 export interface Profile {
@@ -96,6 +98,7 @@ export interface EventJson {
   start: string;
   end: string;
 }
+export type MakeupJson = EventJson & { unit: string };
 export interface ChangeSide {
   start?: string;
   end?: string;
@@ -164,6 +167,7 @@ export interface ViewEvent {
   place?: string;
   repeat?: RepeatKind;
   rep?: string;
+  makeup?: boolean;
 }
 
 export interface Gap {
@@ -186,6 +190,7 @@ export interface Conflict {
 export interface GroupMeta {
   l: { id: string; n: string }[];
   ct?: string;
+  n?: number;
   t: number;
 }
 

@@ -1,7 +1,7 @@
 import { emptyOv } from './events';
 import { parseICS } from './ics';
 import { pk, store } from './storage';
-import type { Absence, Change, CustomEvent, Overrides, PlanVersion } from './types';
+import type { Absence, Change, CustomEvent, MakeupJson, Overrides, PlanVersion } from './types';
 
 export const MAX_VERSIONS = 2;
 
@@ -16,6 +16,9 @@ export const getOverrides = (id: string): Overrides => ({ ...emptyOv(), ...store
 export const setOverrides = (id: string, ov: Overrides) => store.set(pk('overrides', id), ov);
 export const getAbsences = (id: string) => store.get<Absence[]>(pk('absences', id), []);
 export const setAbsences = (id: string, list: Absence[]) => store.set(pk('absences', id), list);
+
+export const getMakeups = (id: string) => store.get<MakeupJson[]>(pk('makeups', id), []);
+export const setMakeups = (id: string, list: MakeupJson[]) => store.set(pk('makeups', id), list);
 
 export function storeIcs(id: string, text: string, at = Date.now()) {
   const old = getIcs(id);
@@ -35,5 +38,5 @@ export function tidyVersions(id: string, synced: number | null | undefined) {
 }
 
 export function removePlanData(id: string) {
-  for (const k of ['ics', 'custom', 'overrides', 'versions', 'changes', 'absences']) store.remove(pk(k, id));
+  for (const k of ['ics', 'custom', 'overrides', 'versions', 'changes', 'absences', 'makeups']) store.remove(pk(k, id));
 }

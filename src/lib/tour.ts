@@ -40,6 +40,11 @@ export const TOUR_STEPS: TourStep[] = [
     text: 'Kliknij zajęcia, żeby zobaczyć prowadzącego i harmonogram, zaznaczyć nieobecność (licznik jest osobny dla każdych zajęć) albo ręcznie zmienić salę, godzinę lub oznaczyć je jako odwołane.'
   },
   {
+    target: '[data-tour=makeup]',
+    title: 'Odrabianie zajęć',
+    text: 'Opuszczasz laboratorium albo ćwiczenia? Wybierz termin, a apka pokaże te same zajęcia w innych grupach: kiedy są, kto je prowadzi i czy masz wtedy wolne. Ten sam widok otworzysz ze szczegółów zajęć.'
+  },
+  {
     target: '[data-tour=changes]',
     title: 'Zmiany w planie',
     text: 'Po odświeżeniu planu dzwonek pokaże, czy USOS zmienił salę albo godzinę, przeniósł zajęcia lub je odwołał.',

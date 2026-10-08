@@ -32,7 +32,7 @@
   const lect = $derived(lectLabel(e));
   const title = $derived.by(() => {
     const orig = e.mod.size && e.orig ? ` · w USOS: ${fmtDay(e.orig.start)} ${hm(e.orig.start)}–${hm(e.orig.end)}${e.orig.room ? ', s. ' + e.orig.room : ''}` : '';
-    return `${t.n} · ${e.name} · ${tm}${e.note ? ' · ' + e.note : ''}${orig}${e.srv ? ' · zmiana w USOS: ' + changeLine(e.srv) : ''}${e.ghost ? ' · zniknęło z planu w USOS' : ''}${e.absent ? ' · nieobecność' : ''}`;
+    return `${t.n} · ${e.name} · ${tm}${e.note ? ' · ' + e.note : ''}${orig}${e.srv ? ' · zmiana w USOS: ' + changeLine(e.srv) : ''}${e.ghost ? ' · zniknęło z planu w USOS' : ''}${e.absent ? ' · nieobecność' : ''}${e.makeup ? ' · odrabianie w innej grupie' : ''}`;
   });
 
   const openDetail = () => openSheet({ name: 'detail', uid: e.uid! });
@@ -82,7 +82,7 @@
     {@render progress()}
   </button>
 {:else}
-  <div class={cls} class:cancel={e.cancelled} class:srvchg={!!e.srv} role="button" tabindex="0" style="{pos};{typeStyle(t.k)}" {title} onclick={openDetail} onkeydown={onKey}>
+  <div class={cls} class:cancel={e.cancelled} class:srvchg={!!e.srv} class:mk={e.makeup} role="button" tabindex="0" style="{pos};{typeStyle(t.k)}" {title} onclick={openDetail} onkeydown={onKey}>
     <span class="side">
       {#if e.srv}<span class="flag srv"><Icon name="bell" /></span>{/if}
       {#if e.mod.size && act(e)}<span class="flag"><Icon name="swap" /></span>{/if}
@@ -99,6 +99,8 @@
         <span class="skip">{e.skip}</span>
       {:else if hasState}
         {@render state()}
+      {:else if e.makeup}
+        <span class="ty"><span class="mkl">Odrabianie</span> {t.n} · gr. {e.group}</span>
       {:else}
         <span class="ty">{t.n}{e.group ? ` · gr. ${e.group}` : ''}</span>
       {/if}

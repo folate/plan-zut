@@ -9,6 +9,7 @@
   import ExportSheet from './sheets/ExportSheet.svelte';
   import HistorySheet from './sheets/HistorySheet.svelte';
   import ImportSheet from './sheets/ImportSheet.svelte';
+  import MakeupSheet from './sheets/MakeupSheet.svelte';
   import NewsSheet from './sheets/NewsSheet.svelte';
   import PlansSheet from './sheets/PlansSheet.svelte';
   import ProfileSheet from './sheets/ProfileSheet.svelte';
@@ -29,6 +30,7 @@
       {:else if s.name === 'event'}<EventSheet id={s.id} />
       {:else if s.name === 'changes'}<ChangesSheet />
       {:else if s.name === 'absences'}<AbsencesSheet />
+      {:else if s.name === 'makeup'}<MakeupSheet uid={s.uid} />
       {:else if s.name === 'detail'}<DetailSheet uid={s.uid} />
       {:else if s.name === 'history'}<HistorySheet id={s.id} />
       {:else if s.name === 'source'}<SourcePicker target={s.target} />

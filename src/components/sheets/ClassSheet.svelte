@@ -5,7 +5,7 @@
   import { applyOv, cancelledByRule, cancelRules, ruleHits } from '../../lib/events';
   import { saveOverrides } from '../../lib/plans';
   import type { CancelRule, Override } from '../../lib/types';
-  import { closeSheet } from '../../lib/ui.svelte';
+  import { backSheet, closeSheet, ui } from '../../lib/ui.svelte';
   import ConfirmButton from '../ConfirmButton.svelte';
   import DateField from '../DateField.svelte';
   import Icon from '../Icon.svelte';
@@ -187,7 +187,7 @@
 
     {#snippet footer()}
       {#if hasSeries || hasSingle}<ConfirmButton class="btn danger sp" confirm="Na pewno?" onconfirm={reset}>Przywróć z USOS</ConfirmButton>{/if}
-      <button class="btn" type="button" onclick={closeSheet}>Anuluj</button>
+      <button class="btn" type="button" onclick={() => (ui.stack.length ? backSheet() : closeSheet())}>Anuluj</button>
       <button class="btn fill" type="button" onclick={save}>Zapisz</button>
     {/snippet}
   </Sheet>

@@ -1,27 +1,52 @@
 [
   {
-    "v": "1.1.0",
+    "v": "1.2.0",
     "when": "październik 2026",
     "items": [
       {
-        "icon": "cal",
-        "title": "Odwoływanie zajęć według reguł",
-        "desc": "W edycji zajęć, przy „Wszystkie zajęcia tej grupy”, dodasz kilka reguł naraz, np. wtorki co 2 tygodnie i piątki co tydzień. Każda może mieć własny zakres dat."
+        "icon": "swap",
+        "title": "Odrabianie zajęć",
+        "desc": "Nowy widok pod przyciskiem „Odrabianie” nad planem i w szczegółach zajęć. Wybierasz termin, a apka pokazuje te same zajęcia w innych grupach: datę, salę, prowadzącego i to, czy masz wtedy wolne. Grupy Twojego prowadzącego są osobno i możesz zostawić tylko je. Działa dla wszystkiego poza wykładami."
       },
       {
-        "icon": "check",
-        "title": "Wyjątki od reguł",
-        "desc": "Reguły widać w szczegółach zajęć. Jeśli któryś odwołany termin jednak się odbywa, przywrócisz go tam jednym przyciskiem."
+        "icon": "plus",
+        "title": "Odrabiany termin w Twoim planie",
+        "desc": "Wybrany termin dodasz do planu jednym przyciskiem. Pojawi się jak zwykłe zajęcia, z salą i prowadzącym, oznaczony jako „Odrabianie”, i będzie brany pod uwagę przy kolizjach i przejściach między budynkami."
+      },
+      {
+        "icon": "edit",
+        "title": "Numer zajęć i jego korekta",
+        "desc": "W szczegółach zajęć widać, które to zajęcia z kolei w semestrze. Jeśli jakaś grupa, także Twoja, zaczęła później, poprawisz numer, a apka zapamięta to dla tej grupy. Przy planie z linku numer może być zaniżony, bo USOS nie podaje zajęć wstecz."
+      },
+      {
+        "icon": "cal",
+        "title": "Plan sali",
+        "desc": "Po zalogowaniu przez USOS w szczegółach zajęć jest przycisk „Plan sali”, a w wyszukiwarce znajdziesz salę po budynku i numerze, np. „WI1 313”."
+      },
+      {
+        "icon": "sync",
+        "title": "Częstotliwość aktualizacji planu",
+        "desc": "W Ustawieniach wybierzesz, jak często plan ma się sam odświeżać (domyślnie co 3 godziny): po zalogowaniu przez USOS nawet co 10 minut, bez logowania najczęściej co godzinę. Krótszy odstęp działa przy otwarciu apki, a gdy jest cały czas otwarta, plan odświeża się w tle co godzinę."
+      },
+      {
+        "icon": "history",
+        "title": "Zajęcia z przeszłości",
+        "desc": "Zajęcia, które już się odbyły, zostają w planie, nawet jeśli USOS przestał je zwracać. Przy planie z konta USOS możesz też cofnąć się do wcześniejszych semestrów, a apka dociągnie je do podglądu."
+      },
+      {
+        "icon": "person",
+        "title": "Szczegóły zajęć",
+        "desc": "Przyciski prowadzącego, grupy i sali są teraz obok siebie. Przy planie z konta USOS przycisk uczestników pokazuje od razu liczbę osób w grupie."
       },
       {
         "icon": "own",
-        "title": "Nowy wybór daty i godziny",
-        "desc": "Kalendarz i zegar wyglądają tak samo na każdym urządzeniu. Godzinę wybierzesz z tarczy albo wpiszesz z klawiatury."
+        "title": "Godzina pobrania zawsze widoczna",
+        "desc": "Informacja, kiedy pobrano plan, jest teraz pierwsza na górnym pasku. Na telefonie zniknęła stamtąd liczba zajęć, która i tak się nie mieściła."
       },
       {
-        "icon": "bell",
-        "title": "Lista nowości",
-        "desc": "Po aktualizacji apka da znać, co się zmieniło, a przed pobraniem nowej wersji pokaże, co ona wnosi. Listę znajdziesz też na dole Ustawień."
+        "icon": "check",
+        "title": "Poprawki",
+        "desc": "Podgląd starej wersji w historii planu znowu działa, „Anuluj” w edycji zajęć wraca do szczegółów, a apka wysyła do USOS wyraźnie mniej zapytań przy odświeżaniu planu z konta."
       }
     ]
   }

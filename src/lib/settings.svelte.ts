@@ -9,6 +9,7 @@ export const settings = $state({
   fm: store.get<FilterMode>('filterMode', 'dim'),
   gridRange: store.get('gridRange', { from: 8, to: 16 }),
   cd: { on: true, own: true, transfer: 10, ...store.get<Partial<Collisions>>('collisions', {}) } as Collisions,
+  autoSync: +store.get('autoSync', 180),
   proxy: store.get('proxy', ''),
   hidden: store.get<string[]>('hidden', [])
 });
@@ -49,6 +50,10 @@ export function setGridRange(from: number, to: number) {
 export function setCollisions(patch: Partial<Collisions>) {
   Object.assign(settings.cd, patch);
   store.set('collisions', settings.cd);
+}
+export function setAutoSync(min: number) {
+  settings.autoSync = min;
+  store.set('autoSync', min);
 }
 export function setProxy(p: string) {
   settings.proxy = p;

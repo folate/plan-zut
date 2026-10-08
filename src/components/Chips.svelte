@@ -2,6 +2,7 @@
   import { animate, app, prof } from '../lib/app.svelte';
   import { OWN_KEY, TYPE_ORDER, typeOf, typeStyle } from '../lib/constants';
   import { keyOf } from '../lib/events';
+  import { makeupSubjects } from '../lib/makeup';
   import { setCompare } from '../lib/plans';
   import { setHidden, settings } from '../lib/settings.svelte';
   import { openSheet } from '../lib/ui.svelte';
@@ -42,6 +43,9 @@
       <span class="ck"><Icon name="check" /></span>{t.n}<span class="n">{count(k)}</span>
     </button>
   {/each}
+  {#if !app.viewingPreview && makeupSubjects(app.usos).length}
+    <button type="button" class="chip mkchip" data-tour="makeup" title="Znajdź termin w innej grupie" onclick={() => openSheet({ name: 'makeup' })}>Odrabianie</button>
+  {/if}
   {#if app.absences.length && !app.viewingPreview}
     <button type="button" class="chip abschip" title="Podsumowanie nieobecności" onclick={() => openSheet({ name: 'absences' })}>
       Nieobecności<span class="n">{app.absences.length}</span>

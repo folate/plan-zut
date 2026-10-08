@@ -4,7 +4,7 @@
   import { openPreview } from '../lib/plans';
   import { loadGroupMeta, metaFor, shortName } from '../lib/usos/meta.svelte';
   import { discoverGroups, suggest, usosTime, type SearchItem } from '../lib/usos/plans';
-  import { hasKey } from '../lib/usos/session.svelte';
+  import { hasKey, session } from '../lib/usos/session.svelte';
   import { MODE_NAME, studyInfo } from '../lib/usos/util';
   import Icon from './Icon.svelte';
   import TypeTag from './TypeTag.svelte';
@@ -132,7 +132,7 @@
   <div class="qs-box">
     <Icon name="search" />
     <input
-      type="search" class="qs-in" placeholder="Szukaj przedmiotu lub prowadzącego" autocomplete="off"
+      type="search" class="qs-in" placeholder={session.auth ? 'Przedmiot, prowadzący, sala' : 'Szukaj przedmiotu lub prowadzącego'} autocomplete="off"
       role="combobox" aria-label="Szukaj planu przedmiotu lub prowadzącego" aria-autocomplete="list" aria-controls={listId} aria-expanded={open && hasContent}
       bind:this={input} bind:value={q} oninput={onInput} onfocus={onFocus} onkeydown={onKey} onblur={onBlur}
     />
@@ -149,7 +149,7 @@
           {@const study = it.kind === 'course' && !it.course ? studyInfo(it.id) : null}
           {@const sub = [study?.label, it.sub].filter(Boolean).join(' · ')}
           <button type="button" class="qs-it" class:act={i === active} role="option" aria-selected={i === active} onclick={() => pick(i)}>
-            <span class="qs-ic"><Icon name={it.kind === 'staff' ? 'person' : it.recent ? 'history' : 'book'} /></span>
+            <span class="qs-ic"><Icon name={it.kind === 'staff' ? 'person' : it.recent ? 'history' : it.kind === 'room' ? 'cal' : 'book'} /></span>
             <span class="qs-t">
               <b title={it.name}>{it.name}</b>
               <small title={sub}>{#if study?.mode}<i class="mode {study.mode}">{MODE_NAME[study.mode]}</i>{/if}{sub}</small>

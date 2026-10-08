@@ -1,10 +1,11 @@
 import { addDays, monday, ymd } from '../dates';
-import { icsDate, icsEsc } from '../ics';
+import { icsDate, icsEsc, parseICS } from '../ics';
 import { store } from '../storage';
 import type { ApiSource, GroupRef } from '../types';
 import { api } from './api';
 import { gmKey, putMeta } from './meta.svelte';
-import { hasKey } from './session.svelte';
+import { searchRooms } from './rooms';
+import { hasKey, session } from './session.svelte';
 import { codeFromCourseId, codeFromCtype, groupBy, pl, rankCourses } from './util';
 
 const TT_F = 'start_time|end_time|name|course_id|course_name|classtype_name|group_number|building_name|room_number|unit_id|classgroup_profile_url|lecturer_ids';
@@ -22,7 +23,7 @@ function cached<T>(key: string, ttl: number, fn: () => Promise<T>): Promise<T> {
   return v;
 }
 
-async function pool<T>(items: T[], n: number, fn: (it: T) => Promise<void>) {
+export async function pool<T>(items: T[], n: number, fn: (it: T) => Promise<void>) {
   const q = [...items];
   await Promise.all(Array.from({ length: Math.min(n, q.length) }, async () => {
     while (q.length) await fn(q.shift()!);
@@ -61,13 +62,19 @@ export function activitiesToIcs(acts: any[]) {
 }
 
 const cgCache = new Map<string, { t: number; acts: any[] }>();
-async function groupDates(unit: string | number, group: string | number): Promise<any[]> {
+export async function groupDates(unit: string | number, group: string | number): Promise<any[]> {
   const k = gmKey(unit, group), c = cgCache.get(k);
   if (c && Date.now() - c.t < 5 * 60e3) return c.acts;
   const acts = await api('tt/classgroup_dates2', { unit_id: unit, group_number: group, fields: TT_F });
   cgCache.set(k, { t: Date.now(), acts });
   return acts;
 }
+
+export const unitGroups = (unit: string | number): Promise<number[]> =>
+  cached('unit|' + unit, 10 * MIN, async () => {
+    const cu = await api('courses/course_unit', { course_unit_id: unit, fields: 'id|class_groups' });
+    return [...new Set<number>((cu.class_groups || []).map((g: any) => Math.round(+g.number)))].sort((a, b) => a - b);
+  });
 
 export interface DiscoveredGroup {
   unit_id: string;
@@ -103,6 +110,24 @@ async function findGroups(courseId: string): Promise<{ term: any; groups: Discov
 
 const refs = (gs: any[]): GroupRef[] => gs.map((g) => ({ unit_id: g.course_unit_id, group_number: g.group_number }));
 
+async function currentOnly(gs: any[]): Promise<any[]> {
+  try {
+    const cur = new Set((await currentTerms()).map((t) => t.id));
+    const now = gs.filter((g) => !g.term_id || cur.has(g.term_id));
+    return now.length ? now : gs;
+  } catch {
+    return gs;
+  }
+}
+
+export const ROOM_WEEKS = 4;
+export async function weekEvents(src: string, week: Date) {
+  const [kind, id] = src.split(':');
+  const p = { start: ymd(week), days: 7, fields: TT_F };
+  const acts = kind === 'room' ? await api('tt/room', { ...p, room_id: id }) : await api('tt/user', p, { auth: true });
+  return parseICS(activitiesToIcs(acts));
+}
+
 export async function fetchApiPlan(src: ApiSource, info: { staffName?: string } = {}): Promise<string> {
   if (src.kind === 'groups') {
     const all: any[] = [];
@@ -118,7 +143,7 @@ export async function fetchApiPlan(src: ApiSource, info: { staffName?: string } 
         if (me) info.staffName = `${me.first_name} ${me.last_name}`;
       }
       putMeta(gs);
-      if (gs.length) return fetchApiPlan({ kind: 'groups', groups: refs(gs) });
+      if (gs.length) return fetchApiPlan({ kind: 'groups', groups: refs(await currentOnly(gs)) });
     } catch (e: any) {
       if (e.status && e.status !== 400) throw e;
     }
@@ -126,12 +151,21 @@ export async function fetchApiPlan(src: ApiSource, info: { staffName?: string } 
     for (let w = -1; w < 10; w++) all.push(...(await api('tt/staff', { user_id: src.user_id, start: ymd(addDays(ws, w * 7)), days: 7, fields: TT_F })));
     return activitiesToIcs(all);
   }
+  if (src.kind === 'room') {
+    const all: any[] = [], ws = monday(new Date());
+    await pool([...Array(ROOM_WEEKS).keys()], 3, async (w) =>
+      void all.push(...(await api('tt/room', { room_id: src.room_id, start: ymd(addDays(ws, w * 7)), days: 7, fields: TT_F })))
+    );
+    return activitiesToIcs(all);
+  }
   if (src.kind === 'account') {
-    const r = await api('groups/participant', { active_terms: 'true', fields: GROUP_F }, { auth: true });
+    const people = Date.now() - store.get('peopleAt', 0) > 24 * 60 * MIN;
+    const r = await api('groups/participant', { active_terms: 'true', fields: GROUP_F + (people ? '|participants' : '') }, { auth: true });
+    if (people) store.set('peopleAt', Date.now());
     const gs = Object.values(r.groups || {}).flat() as any[];
     putMeta(gs);
     if (!gs.length) throw new Error('USOS nie zwrócił żadnych Twoich grup w bieżącym semestrze.');
-    return fetchApiPlan({ kind: 'groups', groups: refs(gs) });
+    return fetchApiPlan({ kind: 'groups', groups: refs(await currentOnly(gs)) });
   }
   if (src.kind === 'common') {
     const terms = new Set((await currentTerms()).map((t) => t.id));
@@ -144,7 +178,7 @@ export async function fetchApiPlan(src: ApiSource, info: { staffName?: string } 
 }
 
 export interface SearchItem {
-  kind: 'course' | 'staff' | 'group' | 'common';
+  kind: 'course' | 'staff' | 'group' | 'common' | 'room';
   id?: string;
   name: string;
   sub?: string;
@@ -229,6 +263,7 @@ export async function suggest(q: string, pages = 4): Promise<{ items: SearchItem
         )
         .catch(fail)
     );
+  if (session.auth) jobs.push(searchRooms(q).catch(() => []));
   const res = (await Promise.all(jobs)).flat();
   const seen = new Set(out.map((x) => x.kind + x.id));
   return { items: [...out, ...res.filter((x) => !seen.has(x.kind + x.id))], err: errs[0], more };

@@ -4,6 +4,7 @@
 .det-d{font-size:13px;font-weight:600;opacity:.85}
 .det-t{font:500 26px var(--mono);letter-spacing:-.02em}
 .det-r{font-size:14px;font-weight:500}
+.det-n{font-size:13px;font-weight:600;opacity:.85;margin-top:4px}
 .det-note,.det-srv{font-size:13px;padding:10px 14px;border-radius:14px;background:var(--container);display:grid;gap:3px}
 .det-srv b{font-size:12px;color:var(--primary)}
 .det-srv em{color:var(--cancel);font-style:normal;font-weight:600}
@@ -21,6 +22,9 @@ a.btn{display:inline-flex;align-items:center;text-decoration:none}
 .lect{font-weight:500;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pchips{display:flex;flex-wrap:wrap;gap:6px}
 .pchip{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 8px 0 12px;border-radius:12px;border:1px solid var(--outline-v);background:var(--tile);font-weight:500;font-size:14px;cursor:pointer;transition:background .2s}
+.pchip{flex:none;max-width:100%;white-space:nowrap}
+.pchips .pchip:not(.sm){padding:0 14px 0 10px}
+.pchip span{min-width:0;overflow:hidden;text-overflow:ellipsis}
 .pchip:hover{background:var(--container)}
 .pchip svg{width:18px;height:18px;color:var(--primary)}
 .pchip svg:last-child{color:var(--muted);width:16px;height:16px}

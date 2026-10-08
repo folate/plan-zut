@@ -1,13 +1,13 @@
 import * as planStore from './planStore';
 import { store } from './storage';
-import type { Absence, CustomEvent, Overrides, Profile } from './types';
+import type { Absence, CustomEvent, MakeupJson, Overrides, Profile } from './types';
 
 const GLOBAL_KEYS = ['profiles', 'activeProfile', 'hidden', 'filterMode', 'theme', 'hue', 'gridRange', 'collisions', 'proxy', 'onboarded', 'tourDone'];
 
 export interface SyncData {
   v: 1;
   g: Record<string, unknown>;
-  p: Record<string, { custom: CustomEvent[]; overrides: Partial<Overrides>; absences?: Absence[] }>;
+  p: Record<string, { custom: CustomEvent[]; overrides: Partial<Overrides>; absences?: Absence[]; makeups?: MakeupJson[] }>;
 }
 
 const b64u = {
@@ -36,7 +36,7 @@ export function collectSync(profiles: Profile[], credentials: Record<string, unk
   if (!profiles.some((p) => p.id === d.g.activeProfile)) delete d.g.activeProfile;
   const def = store.get<string | null>('defaultProfile', null);
   if (withDefault && profiles.some((p) => p.id === def)) d.g.defaultProfile = def;
-  for (const p of profiles) d.p[p.id] = { custom: planStore.getCustom(p.id), overrides: planStore.getOverrides(p.id), absences: planStore.getAbsences(p.id) };
+  for (const p of profiles) d.p[p.id] = { custom: planStore.getCustom(p.id), overrides: planStore.getOverrides(p.id), absences: planStore.getAbsences(p.id), makeups: planStore.getMakeups(p.id) };
   Object.assign(d.g, credentials);
   return d;
 }
@@ -85,6 +85,7 @@ function savePlanData(d: SyncData) {
     planStore.setCustom(id, x.custom || []);
     store.set(`p.${id}.overrides`, x.overrides || {});
     planStore.setAbsences(id, x.absences || []);
+    planStore.setMakeups(id, x.makeups || []);
   }
   store.set('onboarded', true);
 }
